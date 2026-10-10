@@ -1206,6 +1206,7 @@
     .th-tag.th-warn { background: #f59e0b; color: #1c1100; box-shadow: 0 0 0 1px #fde68a inset; }
     .th-tag.th-crit { background: #ef4444; color: #fff; box-shadow: 0 0 0 1px #fecaca inset; }
     .fx-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 14px; margin-top: 10px; }
+    body.t2 .fx-sec { background: color-mix(in srgb, var(--pill-bg) calc(100% * var(--ga)), transparent); border-color: color-mix(in srgb, var(--glass-border-subtle) calc(30% + 70% * var(--ga)), transparent); }
     .fx-sec { background: var(--pill-bg); border: 1px solid var(--glass-border-subtle); border-radius: 14px; padding: 12px 16px 6px; }
     .fx-sec h4 { margin: 0 0 6px; font-size: 14px; font-weight: 800; }
     .fx-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 9px 0; font-size: 12.5px; color: var(--text-muted); }
@@ -1337,6 +1338,9 @@
     .mode-seg button:hover { transform: scale(1.08); }
     .mode-seg button.on { background: var(--bg-surface-elevated); box-shadow: 0 2px 8px rgba(0,0,0,.18), inset 0 1px 1px rgba(255,255,255,.6); }
     .live-chip { background: var(--pill-bg); color: var(--text-main); border-color: var(--glass-border-subtle); white-space: nowrap; max-width: 100%; }
+    .live-chip { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .mode-seg { flex: none; }
+    @media (min-width: 1100px) { .header-actions, body.t2 .header-actions { flex-wrap: nowrap; } }
     .live-chip:hover { background: var(--bg-card-hover); }
     .live-sel { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; padding: 9px 12px; color: var(--text-main); font: 600 13px 'Inter', sans-serif; outline: none; }
     @media (max-width: 640px) { .live-chip { font-size: 10.5px; padding: 4px 9px; } }
@@ -1588,7 +1592,7 @@
           <div class="metric-box">
             <span class="metric-label">Current Water Reserve</span>
             <span id="quickLitres" class="metric-value">Connecting...</span>
-            <span id="capacityLitres" class="metric-sub">Total Capacity: 30,000 L</span>
+            <span id="capacityLitres" class="metric-sub">Total Capacity: 103,125 L</span>
           </div>
           <div class="metric-box">
             <span class="metric-label">Alarm state</span>
@@ -2165,12 +2169,6 @@
           <span style="font-size:12px; color:var(--text-dim);">Synchronized with Google Sheets</span>
         </div>
 
-        <div class="input-group" id="glassCtl" style="margin-bottom:20px;">
-          <label>Card transparency (Theme 2): <b id="glassVal">0%</b></label>
-          <input type="range" id="glassRange" min="0" max="100" value="0" oninput="setGlass(this.value)">
-          <span style="font-size:12px; color:var(--text-dim);">Raise it to see butterflies, birds and fireflies through the cards. Saved on this device.</span>
-        </div>
-
         <div class="input-group" style="margin-bottom:20px;">
           <label style="display:flex; align-items:center; gap:10px;">
             <input type="checkbox" id="showCapChk" checked onchange="setShowCap(this.checked)" style="width:18px; height:18px; padding:0; accent-color:var(--primary);">
@@ -2181,19 +2179,19 @@
         <div class="settings-grid">
           <div class="input-group">
             <label>Tank Length (cm)</label>
-            <input type="number" id="cfgLength" value="400" min="10" oninput="calculateVolumeFromInputs()">
+            <input type="number" id="cfgLength" value="625" min="10" oninput="calculateVolumeFromInputs()">
           </div>
           <div class="input-group">
             <label>Tank Width (cm)</label>
-            <input type="number" id="cfgWidth" value="300" min="10" oninput="calculateVolumeFromInputs()">
+            <input type="number" id="cfgWidth" value="550" min="10" oninput="calculateVolumeFromInputs()">
           </div>
           <div class="input-group">
             <label>Tank Height (cm)</label>
-            <input type="number" id="cfgHeight" value="250" min="10" oninput="calculateVolumeFromInputs()">
+            <input type="number" id="cfgHeight" value="300" min="10" oninput="calculateVolumeFromInputs()">
           </div>
           <div class="input-group">
             <label>Calculated Full Capacity (Litres)</label>
-            <input type="text" id="cfgFullCapacity" value="30,000 Litres" readonly style="background:var(--pill-bg); color:var(--primary); font-weight:bold;">
+            <input type="text" id="cfgFullCapacity" value="103,125 Litres" readonly style="background:var(--pill-bg); color:var(--primary); font-weight:bold;">
           </div>
 
           <div class="input-group">
@@ -2202,11 +2200,11 @@
           </div>
           <div class="input-group">
             <label>Critical / Relay Trigger % (Triggers Critical Email & Field Relay)</label>
-            <input type="number" id="cfgCriticalTh" value="10" min="1" max="99">
+            <input type="number" id="cfgCriticalTh" value="20" min="1" max="99">
           </div>
           <div class="input-group" style="grid-column: 1 / -1;">
             <label>Water Level Alert Email Recipients (Comma-separated)</label>
-            <input type="text" id="cfgEmails" value="" placeholder="e.g. admin@company.com, safety@company.com">
+            <input type="text" id="cfgEmails" value="asynchronous677@gmail.com" placeholder="e.g. admin@company.com, safety@company.com">
           </div>
 
           <div class="input-group">
@@ -2219,7 +2217,7 @@
           </div>
           <div class="input-group" style="grid-column: 1 / -1;">
             <label>Offline Alert Email (Person Z - notified when MCU or LoRa is offline)</label>
-            <input type="text" id="cfgOfflineAlertEmails" value="" placeholder="e.g. manager@sharonply.com">
+            <input type="text" id="cfgOfflineAlertEmails" value="subhhranilde@gmail.com" placeholder="e.g. manager@sharonply.com">
           </div>
 
           <div class="input-group" style="grid-column: 1 / -1;">
@@ -2239,6 +2237,12 @@
     <div id="tab-effects" class="tab-pane">
       <div class="card"><div class="card-header"><div class="card-title"><span>🎨 Scene & Effects Settings</span></div>
         <span style="font-size:12px; color:var(--text-dim);">Visible in Theme 2 / Live mode. Saved on this device.</span></div>
+        <div class="input-group" id="glassCtl" style="margin:6px 0 20px;">
+          <label>Card transparency (Theme 2): <b id="glassVal">100%</b></label>
+          <input type="range" id="glassRange" min="0" max="100" value="100" oninput="setGlass(this.value)">
+          <span style="font-size:12px; color:var(--text-dim);">Raise it to see butterflies, birds and fireflies through the cards. Saved on this device.</span>
+        </div>
+
         <div class="input-group" id="liveCtl" style="margin:6px 0 20px;">
 
           <label>🌦️ Weather, daylight & moon (Gummidipoondi)</label>
@@ -2385,7 +2389,7 @@
     let currentLevel = null; // null on load: displays Connecting...
     let currentSensors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     let currentWaterTemp = null; // DS18B20 Water Temperature in °C
-    let tankDimensions = { length: 400, width: 300, height: 250 };
+    let tankDimensions = { length: 625, width: 550, height: 300 };
     let warningThreshold = 50;
     let criticalThreshold = 10;
     let relayTriggered = false;
@@ -2499,7 +2503,7 @@
     }
 
     // --- Theme Controller: Light / Dark / Live ---
-    let themeMode = "light";
+    let themeMode = "live";
     function applyDark(on) {
       const was = document.body.classList.contains("dark-mode");
       document.body.classList.toggle("dark-mode", !!on);
@@ -2518,7 +2522,7 @@
       if (window.LiveEnv) window.LiveEnv.enable(mode === "live");
       if (mode !== "live") applyDark(mode === "dark");
     }
-    function initTheme() { setThemeMode(localStorage.getItem("dashboard_theme") || "light"); }
+    function initTheme() { setThemeMode(localStorage.getItem("dashboard_theme") || "live"); }
     function toggleTheme() { setThemeMode({ light: "dark", dark: "live", live: "light" }[themeMode]); }
 
     // --- SLIDING LIQUID GLASS LENS FOR TAB NAVIGATION ---
@@ -4528,9 +4532,9 @@
     const wl = WXL[T.cond], night3 = T.phase === 'night' || T.phase === 'midnight' || T.phase === 'twilight', real = !LV.pv.wx;
     const temp = real ? (LV.wx.ok && LV.wx.temp != null ? ' · ' + Math.round(LV.wx.temp) + '°C' : ' · weather offline') : '';
     $('liveChipIcon').textContent = night3 ? MOONE[Math.round(T.m.p * 8) % 8] : PH[T.phase][1];
-    $('liveChipText').textContent = `${PH[T.phase][0]} · ${wl[1]} ${wl[0]}${temp}`;
+    $('liveChipText').textContent = `${PH[T.phase][0]} · ${wl[1]}${temp}`; chip.setAttribute('data-wx', wl[0]);
     const clock = new Date(T.ms).toLocaleTimeString('en-IN', { timeZone: PLACE.tz, hour: '2-digit', minute: '2-digit' });
-    chip.title = `${PLACE.name} · ${clock} IST${LV.pv.ms || LV.pv.wx ? ' (preview)' : ''}\nSun ${T.alt.toFixed(1)}° · Moon: ${moonName(T.m.p)} ${Math.round(T.m.ill * 100)}% lit` + (real && LV.wx.ok && LV.wx.hum != null ? `\nHumidity ${LV.wx.hum}% · Wind ${Math.round(LV.wx.wind)} km/h · Cloud ${Math.round(LV.wx.cloud)}%` : '') + '\nClick to refresh weather';
+    chip.title = `${wl[0]} · ${PLACE.name} · ${clock} IST${LV.pv.ms || LV.pv.wx ? ' (preview)' : ''}\nSun ${T.alt.toFixed(1)}° · Moon: ${moonName(T.m.p)} ${Math.round(T.m.ill * 100)}% lit` + (real && LV.wx.ok && LV.wx.hum != null ? `\nHumidity ${LV.wx.hum}% · Wind ${Math.round(LV.wx.wind)} km/h · Cloud ${Math.round(LV.wx.cloud)}%` : '') + '\nClick to refresh weather';
     chip.style.display = 'inline-flex';
   }
   function tick(dt, snap) {
@@ -4645,7 +4649,7 @@
         g.globalAlpha = n * a * .5; g.drawImage(S.o[o.i], x - o.sz / 2, y - o.sz / 2, o.sz, o.sz); g.globalAlpha = d * a * .16; g.drawImage(S.sun, x - o.sz / 2, y - o.sz / 2, o.sz, o.sz); }
       g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
       const hill = (b, a, f, ph, c1, c2) => { g.fillStyle = col(c1, c2, n); g.beginPath(); g.moveTo(0, h); for (let x = 0; x <= w + 20; x += 20) g.lineTo(x, b + Math.sin(x * f + ph) * a + Math.sin(x * f * 2.3 + ph * 2) * a * .35); g.lineTo(w + 20, h); g.fill(); };
-      hill(h * .74, 26, .004, 1, [150, 208, 170], [10, 44, 56]); hill(h * .82, 22, .006, 4, [110, 190, 130], [8, 34, 46]);
+      hill(h * .74, 26, .004, 1, [150, 208, 170], [10, 44, 56]); drawAnimals(dt, 0); hill(h * .82, 22, .006, 4, [110, 190, 130], [8, 34, 46]); drawAnimals(dt, 1);
 
       const fa = d * fv;
       if (fa > .02) {
@@ -4667,7 +4671,6 @@
         }
         g.globalAlpha = 1;
       }
-      drawAnimals(dt);
       g.lineCap = 'round';
       for (let Ly = 0; Ly < 3; Ly++) { g.strokeStyle = col(GD[Ly], GN[Ly], n); g.lineWidth = [2, 3, 4.2][Ly]; g.beginPath();
         for (const b of blades[Ly]) { const dx = b.x - mx, push = Math.abs(dx) < 90 && my > h - b.h - 60 ? Math.sign(dx) * (90 - Math.abs(dx)) * .5 * (b.h / 110) : 0,
@@ -4718,8 +4721,8 @@
     fly: { show: true, n: 36, mode: 'single', col: '#d2ff6e', pal: ['#d2ff6e', '#7ee8ff', '#ffb0f0', '#ffe27a'] },
     bird: { show: true, n: 6, style: 'black' },
     perch: { on: true }, scare: { on: true, r: 120, sp: 2 },
-    an: { show: true, deer: 1, zebra: 1, lion: 0, tiger: 0, elephant: 1, chipmunk: 1, squirrel: 1 },
-    freq: { perch: 'sometimes', critter: 'sometimes', animal: 'sometimes' },
+    an: { show: true, deer: 1, zebra: 1, lion: 0, tiger: 0, hunt: true, elephant: 1, giraffe: 0, cow: 0, pig: 0, buffalo: 0, ox: 0, hippo: 0, rhino: 0, bison: 0, horse: 0, camel: 0, goat: 0, sheep: 0, kangaroo: 0, mammoth: 0, sauropod: 0, trex: 0, chipmunk: 1, squirrel: 1 },
+    freq: { perch: 'sometimes', critter: 'sometimes', animal: 'sometimes', hunt: 'sometimes' },
     fxl: { rays: true, ripple: true, force: false, lite: false, fps: '30' }
   };
   const FX = JSON.parse(JSON.stringify(FXD));
@@ -4727,8 +4730,16 @@
   const SP = () => (FX.scare.sp || 2) / 2, GAPS = { sometimes: [40, 90], often: [12, 30], always: [1, 4] }, gap = k => { const q = GAPS[k] || GAPS.sometimes; return q[0] + R() * (q[1] - q[0]); };
   let pmx = -999, pmy = -999, CARDS = [], lastRay = 0, rip = [], animals = [], crit = [], ripT = 0;
   const LIGHT = { x: 0, y: 0, a: 0, moon: false, warm: 0 };
-  addEventListener('pointermove', e => { pmx = e.clientX; pmy = e.clientY; }, { passive: true });
-  addEventListener('pointerdown', e => { pmx = e.clientX; pmy = e.clientY; }, { passive: true });
+  /* one pointer for mouse, finger and pen: a tap/touch scares animals, birds, butterflies and critters exactly like the cursor; after a finger lifts the point lingers briefly so the reaction plays out */
+  let ptT = 0; const setP = (x, y) => { clearTimeout(ptT); pmx = x; pmy = y; }, relP = ms => { clearTimeout(ptT); ptT = setTimeout(() => { pmx = pmy = -999; }, ms); };
+  addEventListener('pointermove', e => setP(e.clientX, e.clientY), { passive: true });
+  addEventListener('pointerdown', e => setP(e.clientX, e.clientY), { passive: true });
+  addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') relP(1400); }, { passive: true });
+  addEventListener('pointercancel', () => relP(700), { passive: true });
+  addEventListener('touchstart', e => { const q = e.touches[0]; if (q) setP(q.clientX, q.clientY); }, { passive: true });
+  addEventListener('touchmove', e => { const q = e.touches[0]; if (q) setP(q.clientX, q.clientY); }, { passive: true });
+  addEventListener('touchend', () => relP(1400), { passive: true });
+  addEventListener('touchcancel', () => relP(700), { passive: true });
   document.documentElement.addEventListener('mouseleave', () => { pmx = pmy = -999; });
   const hex3 = c => [1, 3, 5].map(i => parseInt(c.substr(i, 2), 16)), flySprs = {}, flySpr = c => flySprs[c] || (flySprs[c] = spr(...hex3(c)));
   function seedCreatures() {
@@ -4755,26 +4766,111 @@
     if (FX.perch.on && t > b.np && CARDS.length) { b.card = CARDS[R() * CARDS.length | 0]; b.po = .08 + R() * .84; b.st = 'land'; }
     return false;
   }
-  const ANI = { deer: ['🦌', 74], zebra: ['🦓', 72], lion: ['🦁', 58], tiger: ['🐅', 80], elephant: ['🐘', 118] }, emoC = {};
+  const ANI = { deer: ['🦌', 74], zebra: ['🦓', 72], lion: ['LION', 100], tiger: ['🐅', 80], elephant: ['🐘', 118], giraffe: ['🦒', 124], cow: ['🐄', 76], pig: ['🐖', 56], buffalo: ['🐃', 84], ox: ['🐂', 80], hippo: ['🦛', 96], rhino: ['🦏', 100], bison: ['🦬', 88], horse: ['🐎', 88], camel: ['🐪', 96], goat: ['🐐', 56], sheep: ['🐏', 58], kangaroo: ['🦘', 78], mammoth: ['🦣', 120], sauropod: ['🦕', 130], trex: ['🦖', 100] }, emoC = {},
+    PRED = { lion: 1, tiger: 1 }, BIG = { elephant: 1, mammoth: 1, sauropod: 1, hippo: 1, rhino: 1 }, FLIP = { sauropod: 1, trex: 1 };
+  function lionSpr(sz) {
+    const key = 'LION' + sz; if (emoC[key]) return emoC[key];
+    const s = Math.ceil(sz * 1.35), c = document.createElement('canvas'); c.width = c.height = s; const x = c.getContext('2d'); x.scale(s / 135, s / 135); x.lineCap = 'round';
+    const lg = (x0, y0, x1, y1, a, b) => { const q = x.createLinearGradient(x0, y0, x1, y1); q.addColorStop(0, a); q.addColorStop(1, b); return q; };
+    const el = (cx, cy, rx, ry, f, rot) => { x.fillStyle = f; x.beginPath(); x.ellipse(cx, cy, rx, ry, rot || 0, 0, TAU); x.fill(); };
+    const leg = (px, w, a, b) => { x.fillStyle = lg(px - w, 0, px + w, 0, a, b); x.beginPath(); x.roundRect(px - w / 2, 76, w, 38, w * .4); x.fill(); el(px - w * .2, 114, w * .78, 3.4, b); };
+    el(68, 116, 52, 4, 'rgba(0,0,0,.22)');
+    /* tail */
+    x.strokeStyle = '#b9803c'; x.lineWidth = 3.6; x.beginPath(); x.moveTo(108, 62); x.bezierCurveTo(124, 58, 132, 70, 129, 88); x.stroke(); el(129, 93, 4.6, 8, '#3f2210', .08);
+    /* far legs */
+    leg(54, 9, '#a36d2c', '#8a581f'); leg(106, 10, '#a36d2c', '#8a581f');
+    /* body + haunch */
+    el(72, 70, 41, 19, lg(0, 50, 0, 90, '#e2b068', '#b98340')); el(100, 73, 21, 20, lg(0, 52, 0, 94, '#dca95f', '#b27a38')); el(70, 85, 34, 6, 'rgba(244,222,180,.35)');
+    /* near legs */
+    leg(44, 10, '#d9a45a', '#bd8640'); leg(94, 11, '#d9a45a', '#bd8640');
+    /* mane */
+    for (let i = 0; i < 26; i++) { const a = i / 26 * TAU; el(35 + Math.cos(a) * 21, 65 + Math.sin(a) * 21, 11, 6.5, i % 2 ? '#4a290e' : '#5f3a15', a); }
+    el(45, 82, 17, 11, '#55320f'); el(40, 88, 12, 8, '#46270c');
+    { const q = x.createRadialGradient(35, 64, 4, 35, 64, 26); q.addColorStop(0, '#9a6a2e'); q.addColorStop(1, '#4e2d10'); el(35, 65, 26, 25, q); }
+    /* head */
+    el(30, 52, 5.4, 5.4, '#c28a42'); el(30, 52, 3, 3, '#6b3a1c');
+    el(25, 68, 15, 14, lg(0, 54, 0, 82, '#ebb96f', '#c58d45')); el(14, 74, 9.5, 7.2, '#f2dbb0'); el(17, 78.5, 6, 3.6, '#e6c795');
+    x.fillStyle = '#35190d'; x.beginPath(); x.moveTo(5.5, 69.5); x.quadraticCurveTo(9, 66.5, 12.8, 69.5); x.quadraticCurveTo(9.5, 74, 5.5, 69.5); x.fill();
+    x.strokeStyle = '#4a2a14'; x.lineWidth = 1.1; x.beginPath(); x.moveTo(9.2, 72); x.lineTo(9.6, 76.5); x.quadraticCurveTo(13, 80, 18.5, 77.6); x.stroke();
+    x.fillStyle = 'rgba(70,35,15,.55)'; for (const [px, py] of [[13, 74], [15.5, 75.4], [12, 77]]) x.fillRect(px, py, 1, 1);
+    el(21, 63.4, 3.1, 2.1, '#d99a2a', -.15); el(21, 63.4, 1.5, 1.5, '#1d0f06'); el(20.5, 62.8, .6, .6, '#fff');
+    x.strokeStyle = '#5a3414'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(17, 60.2); x.quadraticCurveTo(21, 58.6, 25.5, 61); x.stroke();
+    return emoC[key] = c;
+  }
   function emo(ch, sz, filt) {
-    const k = ch + sz + (filt || ''); if (emoC[k]) return emoC[k]; const s = Math.ceil(sz * 1.35), c = document.createElement('canvas'); c.width = c.height = s; const x = c.getContext('2d');
+    if (ch === 'LION') return lionSpr(sz); const k = ch + sz + (filt || ''); if (emoC[k]) return emoC[k]; const s = Math.ceil(sz * 1.35), c = document.createElement('canvas'); c.width = c.height = s; const x = c.getContext('2d');
     x.font = `${sz}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; if (filt) x.filter = filt; x.fillText(ch, s / 2, s / 2); return emoC[k] = c;
   }
   function mkAnimals() {
-    animals = []; for (const k in ANI) for (let i = 0; i < FX.an[k]; i++) animals.push({ k, on: 0, wait: R() * gap(FX.freq.animal) * .5, ph: R() * TAU });
+    animals = []; for (const k in ANI) for (let i = 0; i < FX.an[k]; i++) animals.push({ k, on: 0, wait: R() * gap(FX.freq.animal) * .5, ph: R() * TAU, st: 'walk', id: animals.length });
     crit = []; for (const k of ['chipmunk', 'squirrel']) for (let i = 0; i < FX.an[k]; i++) crit.push({ k, on: 0, wait: 2 + R() * gap(FX.freq.critter) * .5 });
   }
-  function drawAnimals(dt) {
+  const YZ = z => z < .45 ? 0.765 * h + (0.83 - 0.765) * h * (z / .45) : 0.83 * h + (h - 30 - 0.83 * h) * ((z - .45) / .55), lerp = (p, q, u) => p + (q - p) * u;
+  function animalMarks(im, ss) {
+    const W = im.width * ss, H = im.height * ss; g.save(); g.translate(0, -H * .36); g.lineCap = 'round'; g.strokeStyle = '#b3121c'; g.lineWidth = Math.max(1.6, W * .03);
+    for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(-W * .14 + i * W * .1, -H * .17); g.lineTo(-W * .05 + i * W * .1, H * .07); g.stroke(); }
+    g.fillStyle = 'rgba(150,10,18,.85)'; g.beginPath(); g.ellipse(-W * .2, -H * .02, W * .07, H * .05, 0, 0, TAU); g.fill(); g.beginPath(); g.ellipse(W * .07, H * .06, W * .05, H * .035, .4, 0, TAU); g.fill(); g.restore();
+  }
+  function drawAnimals(dt, pass) {
     if (!FX.an.show) return; const sc = Math.max(.7, Math.min(1.2, h / 850));
-    for (const a of animals) {
-      const [ch, base] = ANI[a.k];
-      if (!a.on) { a.wait -= dt; if (a.wait > 0) continue; a.on = 1; a.dir = R() < .5 ? 1 : -1; a.x = a.dir > 0 ? -base : w + base; a.v = (18 + R() * 24) * (a.k === 'elephant' ? .7 : 1); a.y = h - (44 + R() * 34); }
-      if (FX.scare.on && Math.hypot(a.x - pmx, a.y - base * .4 - pmy) < FX.scare.r * 1.1) { a.dir = a.x >= pmx ? 1 : -1; a.v = Math.min(170 * SP(), a.v + 320 * SP() * dt); }
-      a.x += a.dir * a.v * dt; a.ph += dt * a.v * .1;
-      if ((a.dir > 0 && a.x > w + base * 1.2) || (a.dir < 0 && a.x < -base * 1.2)) { a.on = 0; a.wait = gap(FX.freq.animal); continue; }
-      const im = emo(ch, base), z = sc * base / im.width * 1.35 * (1 / 1.35) * 1.35;
-      g.save(); g.globalAlpha = 1 - night * .45; g.translate(a.x, a.y - Math.abs(Math.sin(a.ph)) * 3); g.scale(a.dir > 0 ? -1 : 1, 1);
-      g.drawImage(im, -im.width * sc / 2, -im.height * sc * .86, im.width * sc, im.height * sc); g.restore();
+    if (pass === 0) {
+      const act = animals.filter(q => q.on), preds = act.filter(q => PRED[q.k] && q.st !== 'caught');
+      for (const a of animals) {
+        const [ch, base] = ANI[a.k], isP = !!PRED[a.k];
+        if (!a.on) {
+          a.wait -= dt; if (a.wait > 0) continue; let dir = R() < .5 ? 1 : -1;
+          const clear = d => isP || preds.every(p => Math.abs(p.x - (d > 0 ? -base : w + base)) > 380);
+          if (!clear(dir)) dir = -dir; if (!clear(dir)) { a.wait = 1.5; continue; }
+          a.on = 1; a.dir = dir; a.x = dir > 0 ? -base : w + base; a.fear = 0; a.st = 'walk'; a.tgt = null; a.prey = null; a.jmp = null; a.jcool = 0; a.hT = 0;
+          a.v0 = a.v = (18 + R() * 24) * (BIG[a.k] ? .7 : 1); a.z = R(); a.huntT = t + 5 + R() * gap(FX.freq.hunt) * .6;
+        }
+        if (a.st === 'caught') continue;
+        a.s = lerp(.5, 1, a.z); a.lay = a.z < .45 ? 0 : 1; a.y = YZ(a.z); a.jcool -= dt;
+        if (a.jmp) { const j = a.jmp; j.u += dt / j.dur; if (j.u < 1) { a.x = lerp(j.x0, j.x1, j.u); a.ph += dt * 9; continue; } a.x = j.x1; a.jmp = null; a.jcool = 3; a.fear = Math.max(a.fear, 1.2); }
+        const doJump = o => { a.jmp = { u: 0, dur: .9, x0: a.x, x1: o.x + a.dir * (ANI[o.k][1] * .75 + 60) }; };
+        if (!isP) {
+          let thr = null, td = 1e9, flee = 0;
+          for (const p of preds) { const d = Math.hypot(a.x - p.x, (a.y - p.y) * 1.6); if (d < 230 + ANI[p.k][1] * .8 && d < td) { td = d; thr = p; } }
+          if (thr) { flee = 1; if (a.fear <= 0) { const dx = a.x - thr.x; a.dir = Math.abs(dx) < 10 ? a.dir : (dx > 0 ? 1 : -1); } a.fear = Math.max(a.fear, .9);
+            if (a.jcool <= 0) { const b = preds.find(p => Math.sign(p.x - a.x) === a.dir && Math.abs(p.x - a.x) < 120 && Math.abs(p.z - a.z) < .35); if (b) { doJump(b); continue; } } }
+          if (!flee && FX.scare.on && Math.hypot(a.x - pmx, a.y - base * a.s * .4 - pmy) < FX.scare.r * 1.1) { a.dir = a.x >= pmx ? 1 : -1; flee = 1; }
+          if (a.fear > 0) { a.fear -= dt; flee = 1; }
+          if (flee) a.v = Math.min((a.doomed ? 120 : 175) * SP(), a.v + 320 * SP() * dt); else a.v += (a.v0 - a.v) * Math.min(1, dt * 1.2);
+        } else {
+          if (a.st !== 'carry' && a.jcool <= 0) { const o = preds.find(p => p !== a && p.st !== 'carry' && !p.jmp && p.dir === -a.dir && Math.sign(p.x - a.x) === a.dir && Math.abs(p.x - a.x) < 70 * a.s + 30 && Math.abs(p.z - a.z) < .25); if (o && a.id < o.id) { doJump(o); continue; } }
+          if (a.st === 'walk') {
+            a.v += (a.v0 - a.v) * Math.min(1, dt * 1.5);
+            if (FX.an.hunt && t > a.huntT && a.x > 0 && a.x < w) {
+              let best = null, bd = 1e9; for (const q of act) { if (PRED[q.k] || q.st === 'caught' || q.jmp || q.x < 40 || q.x > w - 40 || preds.some(p => p !== a && p.tgt === q)) continue; const d = Math.abs(q.x - a.x) + Math.abs(q.z - a.z) * 300; if (d < bd) { bd = d; best = q; } }
+              if (best) { a.st = 'hunt'; a.tgt = best; a.hT = 0; a.win = R() < .55; best.doomed = a.win ? a : null; } else a.huntT = t + 6;
+            }
+          } else if (a.st === 'hunt') {
+            const q = a.tgt; a.hT += dt;
+            if (!FX.an.hunt || !q || !q.on || q.st === 'caught' || a.hT > (a.win ? 16 : 9)) { if (q) q.doomed = null; a.st = 'walk'; a.tgt = null; a.huntT = t + gap(FX.freq.hunt); a.v = a.v0; }
+            else {
+              const dx = q.x - a.x; a.dir = dx >= 0 ? 1 : -1; a.v += (Math.min(560, a.win ? (q.v || 80) * 1.9 + 90 : (q.v || 80) * 1.05 + 20) - a.v) * Math.min(1, dt * 3); a.z += Math.sign(q.z - a.z) * Math.min(Math.abs(q.z - a.z), (a.win ? 1.2 : .5) * dt);
+              if (a.win && Math.abs(dx) < 30 + base * a.s * .35 && Math.abs(q.z - a.z) < .18 && !q.jmp) { q.doomed = null; q.st = 'caught'; q.mark = 1; a.prey = q; a.st = 'carry'; a.tgt = null; a.dir = a.x < w / 2 ? -1 : 1; a.v = 85; }
+            }
+          } else if (a.st === 'carry') a.v = 85;
+        }
+        a.x += a.dir * a.v * dt; a.ph += dt * a.v * .1; if (a.doomed) a.x = Math.max(30, Math.min(w - 30, a.x));
+        if ((a.dir > 0 && a.x > w + base * 1.2) || (a.dir < 0 && a.x < -base * 1.2)) {
+          a.on = 0; a.wait = gap(FX.freq.animal); a.st = 'walk';
+          if (a.prey) { const q = a.prey; q.on = 0; q.st = 'walk'; q.mark = 0; q.wait = gap(FX.freq.animal); a.prey = null; }
+        }
+      }
+    }
+    const vis = animals.filter(a => a.on && a.st !== 'caught' && a.lay === pass).sort((p, q) => p.y - q.y);
+    for (const a of vis) {
+      const [ch, base] = ANI[a.k], im = emo(ch, base), ss = sc * a.s, hop = a.jmp ? Math.sin(Math.PI * a.jmp.u) * 62 * a.s : 0;
+      g.save(); g.globalAlpha = (1 - night * .45) * (.8 + .2 * a.z); g.translate(a.x, a.y - Math.abs(Math.sin(a.ph)) * 3 * a.s - hop); g.scale((a.dir > 0 ? -1 : 1) * (FLIP[a.k] ? -1 : 1), 1);
+      g.drawImage(im, -im.width * ss / 2, -im.height * ss * .86, im.width * ss, im.height * ss);
+      if (a.prey && a.prey.on) { /* carried prey, drawn in the predator's flipped space (head at -x) */
+        const q = a.prey, qi = emo(ANI[q.k][0], ANI[q.k][1]), qs = ss * .72;
+        g.save(); g.translate(-im.width * ss * .34, -im.height * ss * .2 + qi.height * qs * .28); g.rotate(1.25);
+        g.drawImage(qi, -qi.width * qs / 2, -qi.height * qs * .86, qi.width * qs, qi.height * qs); animalMarks(qi, qs); g.restore();
+      }
+      g.restore();
     }
   }
   function drawSit(b) {
@@ -4901,7 +4997,7 @@
     ['✨ Fireflies', [['fly', 'show', 'chk', 'Show fireflies'], ['fly', 'n', 'rng', 'Number', 0, 120], ['fly', 'mode', 'sel', 'Colours', [['multi', 'Multicolour'], ['single', 'Single colour']]], ['fly', 'col', 'col', 'Single colour'], ['fly', 'pal', 'pal', 'Multicolour palette']]],
     ['🐦 Birds', [['bird', 'show', 'chk', 'Show birds'], ['bird', 'n', 'rng', 'Number', 0, 20], ['bird', 'style', 'sel', 'Colour', [['black', 'Black'], ['white', 'White'], ['both', 'Black & white']]], ['perch', 'on', 'chk', 'Sit on card frames'], ['freq', 'perch', 'sel', 'Perch frequency', 'F']]],
     ['👆 Interaction', [['scare', 'on', 'chk', 'Scare away from cursor / touch'], ['scare', 'r', 'rng', 'Scare distance (px)', 40, 260], ['scare', 'sp', 'rng', 'Run-away speed (1 slow – 5 fast)', 1, 5]]],
-    ['🦌 Animals', [['an', 'show', 'chk', 'Show animals'], ['an', 'deer', 'rng', 'Deer', 0, 5], ['an', 'zebra', 'rng', 'Zebra', 0, 5], ['an', 'lion', 'rng', 'Lion', 0, 5], ['an', 'tiger', 'rng', 'Tiger', 0, 5], ['an', 'elephant', 'rng', 'Elephant', 0, 5], ['freq', 'animal', 'sel', 'Walk-by frequency', 'F']]],
+    ['🦌 Animals', [['an', 'show', 'chk', 'Show animals'], ['an', 'hunt', 'chk', 'Predators hunt prey (off = peaceful)'], ['freq', 'hunt', 'sel', 'Hunt frequency', 'F'], ['an', 'deer', 'rng', 'Deer', 0, 5], ['an', 'zebra', 'rng', 'Zebra', 0, 5], ['an', 'lion', 'rng', '🦁 Lion (scares other animals)', 0, 5], ['an', 'tiger', 'rng', '🐅 Tiger (scares other animals)', 0, 5], ['an', 'elephant', 'rng', 'Elephant', 0, 5], ['an', 'giraffe', 'rng', '🦒 Giraffe', 0, 5], ['an', 'cow', 'rng', '🐄 Cow', 0, 5], ['an', 'pig', 'rng', '🐖 Pig', 0, 5], ['an', 'buffalo', 'rng', '🐃 Water buffalo', 0, 5], ['an', 'ox', 'rng', '🐂 Ox', 0, 5], ['an', 'hippo', 'rng', '🦛 Hippo', 0, 5], ['an', 'rhino', 'rng', '🦏 Rhino', 0, 5], ['an', 'bison', 'rng', '🦬 Bison', 0, 5], ['an', 'horse', 'rng', '🐎 Horse', 0, 5], ['an', 'camel', 'rng', '🐪 Camel', 0, 5], ['an', 'goat', 'rng', '🐐 Goat', 0, 5], ['an', 'sheep', 'rng', '🐏 Ram', 0, 5], ['an', 'kangaroo', 'rng', '🦘 Kangaroo', 0, 5], ['an', 'mammoth', 'rng', '🦣 Mammoth', 0, 5], ['an', 'sauropod', 'rng', '🦕 Sauropod', 0, 5], ['an', 'trex', 'rng', '🦖 T-Rex', 0, 5], ['freq', 'animal', 'sel', 'Walk-by frequency', 'F']]],
     ['🐿️ Chipmunk & Squirrel', [['an', 'chipmunk', 'rng', 'Chipmunks', 0, 5], ['an', 'squirrel', 'rng', 'Squirrels', 0, 5], ['freq', 'critter', 'sel', 'Appear frequency', 'F']]],
     ['☀️ Light & Water', [['fxl', 'rays', 'chk', 'Sun/moon ray-traced edge glow'], ['fxl', 'ripple', 'chk', 'Condensation droplets on cards in rain'], ['fxl', 'force', 'chk', 'Preview droplets without rain'], ['fxl', 'lite', 'chk', 'Performance mode (lighter blur + simpler bubble)'], ['fxl', 'fps', 'sel', 'Background animation rate', [['60', '60 fps (smoothest)'], ['30', '30 fps (balanced)'], ['20', '20 fps (lightest)']]]]]
   ];
@@ -4913,7 +5009,7 @@
       const sec = document.createElement('div'); sec.className = 'fx-sec'; sec.innerHTML = `<h4>${title}</h4>`;
       for (const [gk, k, ty, lab, a, b2] of rows) {
         const row = document.createElement('div'); row.className = 'fx-row'; row.innerHTML = `<span>${lab}</span>`; const ctl = document.createElement('div'); ctl.className = 'fx-ctl';
-        const commit = v => { FX[gk][k] = v; fxSave(); if (['n', 'mode', 'col', 'pal', 'style'].includes(k) || gk === 'an' && k !== 'show') seedCreatures(); if (k === 'rays') updateRays(); if (k === 'lite') applyLite(); };
+        const commit = v => { FX[gk][k] = v; fxSave(); if (['n', 'mode', 'col', 'pal', 'style'].includes(k) || gk === 'an' && k !== 'show' && k !== 'hunt') seedCreatures(); if (k === 'rays') updateRays(); if (k === 'lite') applyLite(); };
         if (ty === 'chk') { const i = document.createElement('input'); i.type = 'checkbox'; i.checked = !!FX[gk][k]; i.onchange = () => commit(i.checked); ctl.appendChild(i); }
         else if (ty === 'rng') { const i = document.createElement('input'), v = document.createElement('span'); v.className = 'fx-val'; i.type = 'range'; i.min = a; i.max = b2; i.value = FX[gk][k]; v.textContent = i.value; i.oninput = () => { v.textContent = i.value; }; i.onchange = () => commit(+i.value); ctl.append(i, v); }
         else if (ty === 'sel') { const i = document.createElement('select'); (a === 'F' ? FREQ : a).forEach(([v, l]) => { const o = document.createElement('option'); o.value = v; o.textContent = l; i.appendChild(o); }); i.value = FX[gk][k]; i.onchange = () => commit(i.value); ctl.appendChild(i); }
@@ -4964,10 +5060,10 @@
       hcCard.style.setProperty('--mx', (hcX - hcRect.left).toFixed(0) + 'px'); hcCard.style.setProperty('--my', (hcY - hcRect.top).toFixed(0) + 'px'); });
   }, { passive: true });
   window.setGlass = v => { const T = Math.max(0, Math.min(100, +v || 0)) / 100, r = document.documentElement.style, pc = Math.round(T * 100);
-    r.setProperty('--ga', (1 - T).toFixed(3)); r.setProperty('--gb', (1 - T).toFixed(3)); localStorage.setItem('dashboard_glass', pc);
+    r.setProperty('--ga', (1 - T).toFixed(3)); r.setProperty('--gb', (1 - T).toFixed(3)); localStorage.setItem('dashboard_glass_v2', pc);
     const l = $('glassVal'), sl = $('glassRange'); if (l) l.textContent = pc + '%'; if (sl) sl.value = pc; };
   window.setShowCap = on => { document.body.classList.toggle('hide-cap', !on); localStorage.setItem('dashboard_showcap', on ? 1 : 0); const c = $('showCapChk'); if (c) c.checked = !!on; };
-  addEventListener('DOMContentLoaded', () => { setShowCap(localStorage.getItem('dashboard_showcap') !== '0'); setGlass(localStorage.getItem('dashboard_glass') || 0); seed(); buildFxUI(); initLedTips(); setStyle(+(localStorage.getItem('dashboard_style') || 2)); });
+  addEventListener('DOMContentLoaded', () => { setShowCap(localStorage.getItem('dashboard_showcap') !== '0'); setGlass(localStorage.getItem('dashboard_glass_v2') ?? 100); seed(); buildFxUI(); initLedTips(); setStyle(+(localStorage.getItem('dashboard_style') || 2)); });
 })();
   </script>
 
