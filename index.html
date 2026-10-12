@@ -1152,13 +1152,13 @@
     body.t2 #scene { display: block; }
     body.t2 main, body.t2 .tabs-bar-wrapper, body.t2 footer { position: relative; z-index: 2; }
     body.t2 header, body.t2 .tabs-nav, body.t2 .card, body.t2 .metric-box, body.t2 .led-guide-card, body.t2 .badge, body.t2 .warning-banner {
-      background: linear-gradient(135deg, rgba(var(--tw,255,255,255),calc(.44*var(--ga))), rgba(var(--tw,255,255,255),calc(.14*var(--ga))) 45%, rgba(var(--tw,255,255,255),calc(.3*var(--ga))));
-      -webkit-backdrop-filter: blur(calc(16px*var(--gb))) saturate(calc(1 + var(--ga))) brightness(calc(1 + .06*var(--ga))); backdrop-filter: blur(calc(16px*var(--gb))) saturate(calc(1 + var(--ga))) brightness(calc(1 + .06*var(--ga)));
+      background: linear-gradient(135deg, rgba(var(--tw,255,255,255),calc(.2*var(--gt))), rgba(var(--tw,255,255,255),calc(.05*var(--gt))) 45%, rgba(var(--tw,255,255,255),calc(.13*var(--gt))));
+      -webkit-backdrop-filter: blur(calc(16px*var(--gb))) saturate(calc(1 + .5*var(--ga))); backdrop-filter: blur(calc(16px*var(--gb))) saturate(calc(1 + .5*var(--ga)));
       border: 1px solid var(--glass-border);
       box-shadow: inset 1.5px 1.5px 1px rgba(255,255,255,.75), inset -1px -1px 1px rgba(255,255,255,.25), inset 2px 0 6px -2px rgba(255,60,120,calc(.28*var(--ga))), inset -2px 0 6px -2px rgba(0,220,255,calc(.35*var(--ga))), 0 18px 40px -14px rgba(5,80,60,calc(.38*var(--ga)));
     }
     body.t2.dark-mode header, body.t2.dark-mode .tabs-nav, body.t2.dark-mode .card, body.t2.dark-mode .metric-box, body.t2.dark-mode .led-guide-card, body.t2.dark-mode .badge, body.t2.dark-mode .warning-banner {
-      background: linear-gradient(135deg, rgba(var(--td,200,255,240),calc(.14*var(--ga))), rgba(8,26,44,calc(.34*var(--ga))) 50%, rgba(var(--td,200,255,240),calc(.08*var(--ga))));
+      background: linear-gradient(135deg, rgba(var(--td,200,255,240),calc(.08*var(--gt))), rgba(8,26,44,calc(.26*var(--gt))) 50%, rgba(var(--td,200,255,240),calc(.05*var(--gt))));
       box-shadow: inset 1.5px 1.5px 1px rgba(220,255,245,.3), inset -1px -1px 1px rgba(220,255,245,.08), inset 2px 0 6px -2px rgba(255,60,120,calc(.25*var(--ga))), inset -2px 0 6px -2px rgba(0,220,255,calc(.3*var(--ga))), 0 18px 44px -14px rgba(0,0,0,calc(.6*var(--ga))), 0 0 38px -16px color-mix(in srgb, var(--primary-glow) calc(100% * var(--ga)), transparent);
     }
     body.t2 .card { animation: morph 14s ease-in-out infinite; }
@@ -1193,8 +1193,8 @@
     }
     @media (prefers-reduced-motion: reduce) { body.t2 *, body.t2 *::before { animation-duration: .01ms !important; } }
 
-    :root { --ga: 1; --gb: 1; }
-    body.t2 .tabs-nav { background: rgba(255,255,255,.75); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); border: 1px solid rgba(255,255,255,.75); box-shadow: 0 10px 32px rgba(0,0,0,.04), inset 0 1.5px 2px rgba(255,255,255,.9); }
+    :root { --ga: 1; --gb: 1; --gt: 1; }
+    body.t2 .tabs-nav { background: rgba(255,255,255,calc(.3*var(--gt))); -webkit-backdrop-filter: blur(calc(24px*var(--gb))) saturate(calc(1 + .6*var(--ga))); backdrop-filter: blur(calc(24px*var(--gb))) saturate(calc(1 + .6*var(--ga))); border: 1px solid rgba(255,255,255,.75); box-shadow: 0 10px 32px rgba(0,0,0,.04), inset 0 1.5px 2px rgba(255,255,255,.9); }
     body.t2.dark-mode .tabs-nav { background: rgba(15,23,42,.78); border-color: rgba(255,255,255,.16); box-shadow: 0 12px 36px rgba(0,0,0,.45), inset 0 1.5px 2px rgba(255,255,255,.12); }
     body:not(.t2), body:not(.t2) *, body:not(.t2) *::before, body:not(.t2) *::after, html:has(body:not(.t2)) { cursor: auto !important; }
     body:not(.t2) button, body:not(.t2) a, body:not(.t2) select, body:not(.t2) label, body:not(.t2) .tab-btn, body:not(.t2) .ladder-step, body:not(.t2) [onclick], body:not(.t2) input[type=range], body:not(.t2) input[type=checkbox] { cursor: pointer !important; }
@@ -1215,7 +1215,7 @@
     .th-tag.th-warn { background: #f59e0b; color: #1c1100; box-shadow: 0 0 0 1px #fde68a inset; }
     .th-tag.th-crit { background: #ef4444; color: #fff; box-shadow: 0 0 0 1px #fecaca inset; }
     .fx-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 14px; margin-top: 10px; }
-    body.t2 .fx-sec { background: color-mix(in srgb, var(--pill-bg) calc(100% * var(--ga)), transparent); border-color: color-mix(in srgb, var(--glass-border-subtle) calc(30% + 70% * var(--ga)), transparent); }
+    body.t2 .fx-sec { background: color-mix(in srgb, var(--pill-bg) calc(60% * var(--gt)), transparent); border-color: color-mix(in srgb, var(--glass-border-subtle) calc(30% + 70% * var(--ga)), transparent); }
     .fx-sec { background: var(--pill-bg); border: 1px solid var(--glass-border-subtle); border-radius: 14px; padding: 12px 16px 6px; }
     .fx-sec h4 { margin: 0 0 6px; font-size: 14px; font-weight: 800; }
     .fx-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 9px 0; font-size: 12.5px; color: var(--text-muted); }
@@ -1391,15 +1391,15 @@
     @media (min-width: 641px) {
       /* 4. lighter blur radii: visually near-identical, far cheaper over an animated canvas */
       .card, .tabs-nav { -webkit-backdrop-filter: blur(14px) saturate(180%); backdrop-filter: blur(14px) saturate(180%); }
-      body.t2 .card, body.t2.dark-mode .card { -webkit-backdrop-filter: blur(calc(11px*var(--gb))) saturate(calc(1 + var(--ga))) brightness(calc(1 + .06*var(--ga))); backdrop-filter: blur(calc(11px*var(--gb))) saturate(calc(1 + var(--ga))) brightness(calc(1 + .06*var(--ga))); }
-      body.t2 .tabs-nav, body.t2.dark-mode .tabs-nav { -webkit-backdrop-filter: blur(14px) saturate(180%); backdrop-filter: blur(14px) saturate(180%); }
+      body.t2 .card, body.t2.dark-mode .card { -webkit-backdrop-filter: blur(calc(11px*var(--gb))) saturate(calc(1 + .5*var(--ga))); backdrop-filter: blur(calc(11px*var(--gb))) saturate(calc(1 + .5*var(--ga))); }
+      body.t2 .tabs-nav, body.t2.dark-mode .tabs-nav { -webkit-backdrop-filter: blur(calc(14px*var(--gb))) saturate(calc(1 + .6*var(--ga))); backdrop-filter: blur(calc(14px*var(--gb))) saturate(calc(1 + .6*var(--ga))); }
       body header, body.t2 header, body.t2.dark-mode header { -webkit-backdrop-filter: blur(calc(12px * var(--gb, 1) + 22px * var(--hb))) saturate(calc(1.9 + .3 * var(--hb))); backdrop-filter: blur(calc(12px * var(--gb, 1) + 22px * var(--hb))) saturate(calc(1.9 + .3 * var(--hb))); }
       /* 5. the border-radius 'morph' repaints a blurred card every frame: cards now rest on its first frame */
       body.t2 .card { animation: none; border-radius: 28px 24px 30px 24px; }
     }
     /* 6. auto-enabled only if the page measures itself running slow (< ~37fps for 4s) */
-    body.perf-lite.t2 .card, body.perf-lite.t2.dark-mode .card, body.perf-lite.t2 .tabs-nav, body.perf-lite.t2.dark-mode .tabs-nav { -webkit-backdrop-filter: blur(6px) saturate(150%); backdrop-filter: blur(6px) saturate(150%); }
-    body.perf-lite.t2 header, body.perf-lite.t2.dark-mode header { -webkit-backdrop-filter: blur(8px) saturate(1.6); backdrop-filter: blur(8px) saturate(1.6); }
+    body.perf-lite.t2 .card, body.perf-lite.t2.dark-mode .card, body.perf-lite.t2 .tabs-nav, body.perf-lite.t2.dark-mode .tabs-nav { -webkit-backdrop-filter: blur(calc(7px*var(--gb))) saturate(calc(1 + .3*var(--ga))); backdrop-filter: blur(calc(7px*var(--gb))) saturate(calc(1 + .3*var(--ga))); }
+    body.perf-lite.t2 header, body.perf-lite.t2.dark-mode header { -webkit-backdrop-filter: blur(calc(8px*var(--gb))) saturate(calc(1 + .4*var(--ga))); backdrop-filter: blur(calc(8px*var(--gb))) saturate(calc(1 + .4*var(--ga))); }
     body.perf-lite .ray-edge { box-shadow: inset calc(var(--ux) * -1.5px) calc(var(--uy) * -1.5px) 0 0 rgba(var(--rc,255,240,190), .95), inset calc(var(--ux) * -10px) calc(var(--uy) * -10px) 14px -6px rgba(var(--rc,255,240,190), .6); }
     body.perf-lite .ray-edge::after { display: none; }
     body.perf-lite .card:hover { animation: none !important; }
@@ -5654,7 +5654,7 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
       hcCard.style.setProperty('--mx', (hcX - hcRect.left).toFixed(0) + 'px'); hcCard.style.setProperty('--my', (hcY - hcRect.top).toFixed(0) + 'px'); });
   }, { passive: true });
   window.setGlass = v => { const T = Math.max(0, Math.min(100, +v || 0)) / 100, r = document.documentElement.style, pc = Math.round(T * 100);
-    r.setProperty('--ga', (1 - T).toFixed(3)); r.setProperty('--gb', (1 - T).toFixed(3)); localStorage.setItem('dashboard_glass_v2', pc);
+    r.setProperty('--ga', (1 - T).toFixed(3)); r.setProperty('--gt', ((1 - T) * (1 - T)).toFixed(3)); r.setProperty('--gb', (T >= 1 ? 0 : (0.35 + 2.05 * (1 - T))).toFixed(3)); localStorage.setItem('dashboard_glass_v2', pc);
     const l = $('glassVal'), sl = $('glassRange'); if (l) l.textContent = pc + '%'; if (sl) sl.value = pc; };
   window.setShowCap = on => { document.body.classList.toggle('hide-cap', !on); localStorage.setItem('dashboard_showcap', on ? 1 : 0); const c = $('showCapChk'); if (c) c.checked = !!on; };
   addEventListener('DOMContentLoaded', () => { setShowCap(localStorage.getItem('dashboard_showcap') !== '0'); setGlass(localStorage.getItem('dashboard_glass_v2') ?? 100); seed(); buildFxUI(); initLedTips(); setStyle(+(localStorage.getItem('dashboard_style') || 2)); });
