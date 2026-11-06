@@ -1046,6 +1046,82 @@
       position: relative;
       margin-top: 16px;
     }
+    @keyframes spinBuffering {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .hist-spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(2, 132, 199, 0.25);
+      border-top-color: #0284c7;
+      border-radius: 50%;
+      animation: spinBuffering 0.75s linear infinite;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+    .card-loading-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: rgba(2, 132, 199, 0.12);
+      border: 1px solid rgba(2, 132, 199, 0.35);
+      color: #0284c7;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    body.dark-mode .card-loading-badge {
+      background: rgba(56, 189, 248, 0.14);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+    }
+    body.dark-mode .hist-spinner {
+      border-color: rgba(56, 189, 248, 0.25);
+      border-top-color: #38bdf8;
+    }
+    .chart-loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 15;
+      border-radius: 14px;
+      transition: opacity 0.2s ease;
+    }
+    body.dark-mode .chart-loading-overlay {
+      background: rgba(15, 23, 42, 0.82);
+    }
+    .chart-loading-overlay .overlay-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3.5px solid rgba(2, 132, 199, 0.2);
+      border-top-color: #0284c7;
+      border-radius: 50%;
+      animation: spinBuffering 0.75s linear infinite;
+    }
+    body.dark-mode .chart-loading-overlay .overlay-spinner {
+      border-color: rgba(56, 189, 248, 0.2);
+      border-top-color: #38bdf8;
+    }
+    .chart-loading-overlay span {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0284c7;
+      letter-spacing: 0.02em;
+    }
+    body.dark-mode .chart-loading-overlay span {
+      color: #38bdf8;
+    }
     .history-stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1897,8 +1973,8 @@
               <div id="levelDisplay" class="vessel-pct-text">--%</div>
               <div id="offlineTagVessel" class="off-tag"></div>
               <div id="litresDisplay" class="vessel-litres-text">Connecting...</div>
-              <div id="vesselTempDisplay" class="vessel-temp-text">
-                <span>🌡️</span> <span id="vesselTempText">--°C</span>
+              <div id="vesselTempDisplay" class="vessel-temp-text" style="display:none;">
+                <span>🌡️</span> <span id="vesselTempText"></span>
               </div>
             </div>
           </div>
@@ -1941,8 +2017,8 @@
             <div class="ring-center-info">
               <div class="title">Current Level</div>
               <div class="value" id="ringCenterPct">--%</div>
-              <div style="font-size:14px; font-weight:700; color:var(--accent-amber); margin-top:3px; display:flex; align-items:center; justify-content:center; gap:4px; font-family:'JetBrains Mono',monospace;" id="ringCenterTemp">
-                <span>🌡️</span> <span id="ringCenterTempText">--°C</span>
+              <div style="font-size:14px; font-weight:700; color:var(--accent-amber); margin-top:3px; display:none; align-items:center; justify-content:center; gap:4px; font-family:'JetBrains Mono',monospace;" id="ringCenterTemp">
+                <span>🌡️</span> <span id="ringCenterTempText"></span>
               </div>
               <div style="font-size:12px; color:var(--primary); margin-top:2px;" id="ringCenterStatus">Connecting...</div>
             </div>
@@ -2306,14 +2382,26 @@
           <div class="card-title">
             <span>📈 Historical Water Reserve & Consumption Trends</span>
           </div>
-          <span style="font-size:12.5px; font-weight:600; color:var(--text-muted);">Saved Cloud Records & Live Logs</span>
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div id="histBufferingBadge" class="card-loading-badge" style="display:none;">
+              <span class="hist-spinner"></span> <span id="histBufferingBadgeText">Fetching History...</span>
+            </div>
+            <span style="font-size:12.5px; font-weight:600; color:var(--text-muted);">Saved Cloud Records & Live Logs</span>
+          </div>
         </div>
 
         <div class="history-controls">
-          <div class="filter-pills">
-            <button class="filter-pill active" id="pillToday" onclick="loadHistoryRange('today')">Today</button>
-            <button class="filter-pill" id="pill3d" onclick="loadHistoryRange('3d')">Last 3 Days</button>
-            <button class="filter-pill" id="pill7d" onclick="loadHistoryRange('7d')">Last 7 Days</button>
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div class="filter-pills" id="histFilterPills">
+              <button class="filter-pill" id="pill1h" onclick="loadHistoryRange('1h')">1 Hour</button>
+              <button class="filter-pill" id="pill3h" onclick="loadHistoryRange('3h')">3 Hours</button>
+              <button class="filter-pill active" id="pill24h" onclick="loadHistoryRange('24h')">24 Hours</button>
+              <button class="filter-pill" id="pill3d" onclick="loadHistoryRange('3d')">Last 3 Days</button>
+              <button class="filter-pill" id="pill7d" onclick="loadHistoryRange('7d')">Last 7 Days</button>
+            </div>
+            <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; font-size:12px; font-weight:700; color:#ef4444; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.22); border-radius:8px;" title="Downtime & telemetry outages are highlighted with a continuous red dotted line on true chronological timeline">
+              <span style="display:inline-block; width:14px; border-top:2.5px dashed #ef4444;"></span> Gaps: Red Dotted Line
+            </span>
           </div>
 
           <div class="custom-date-group">
@@ -2349,6 +2437,10 @@
         </div>
 
         <div class="chart-container-card">
+          <div id="histLoadingOverlay" class="chart-loading-overlay" style="display:none;">
+            <div class="overlay-spinner"></div>
+            <span id="histLoadingOverlayText">Fetching Historical Telemetry...</span>
+          </div>
           <canvas id="waterHistoryChart"></canvas>
         </div>
       </div>
@@ -2381,12 +2473,69 @@
           <div class="metric-box">
             <span class="metric-label">Current Water Temp</span>
             <span id="histCurrentTemp" class="metric-value" style="color:var(--primary);">--°C</span>
-            <span class="metric-sub" id="histTempQuality">Normal Range (15°C – 35°C)</span>
+            <span class="metric-sub" id="histTempQuality">Normal Range (24°C – 45°C)</span>
           </div>
         </div>
 
         <div class="chart-container-card">
+          <div id="tempLoadingOverlay" class="chart-loading-overlay" style="display:none;">
+            <div class="overlay-spinner"></div>
+            <span>Loading Temperature Trend...</span>
+          </div>
           <canvas id="waterTempChart"></canvas>
+        </div>
+      </div>
+
+      <!-- NODE OUTAGE & DOWNTIME AUDIT LOG CARD -->
+      <div class="card" style="margin-top:24px;">
+        <div class="card-header">
+          <div class="card-title">
+            <span>⏱️ Node Outage & Connectivity Audit Log</span>
+          </div>
+          <span style="font-size:12.5px; font-weight:600; color:var(--text-muted);">Differentiates Office ESP32 vs Field Tank Nano Outages</span>
+        </div>
+
+        <div class="history-stats-grid" style="margin-bottom:20px;">
+          <div class="metric-box">
+            <span class="metric-label">Office ESP32 Outages</span>
+            <span id="espOutageCount" class="metric-value" style="color:var(--accent-red);">0</span>
+            <span class="metric-sub" id="espTotalDowntime">Total Downtime: 0m</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Field Tank Nano Outages</span>
+            <span id="nanoOutageCount" class="metric-value" style="color:var(--accent-amber);">0</span>
+            <span class="metric-sub" id="nanoTotalDowntime">Total Downtime: 0m</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Longest Recorded Outage</span>
+            <span id="maxOutageDuration" class="metric-value" style="color:var(--text-main);">0m</span>
+            <span class="metric-sub" id="maxOutageNode">None</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Connectivity State</span>
+            <span id="overallOutageStatus" class="metric-value" style="color:var(--accent-green); font-size:18px;">ALL ONLINE</span>
+            <span class="metric-sub" id="overallOutageDesc">Zero downtime recorded</span>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left;">
+            <thead>
+              <tr style="border-bottom:2px solid var(--glass-border-subtle); color:var(--text-muted); font-size:11.5px; text-transform:uppercase; letter-spacing:0.5px;">
+                <th style="padding:10px 12px;">Node / Device</th>
+                <th style="padding:10px 12px;">Outage Start</th>
+                <th style="padding:10px 12px;">Recovery Time</th>
+                <th style="padding:10px 12px;">Duration</th>
+                <th style="padding:10px 12px;">Status</th>
+                <th style="padding:10px 12px;">Diagnostic Root Cause</th>
+              </tr>
+            </thead>
+            <tbody id="outageTableBody">
+              <tr>
+                <td colspan="6" style="padding:16px; text-align:center; color:var(--text-muted);">Analyzing telemetry logs for outages...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -2445,23 +2594,55 @@
           <div class="card-title">
             <span>📶 LoRa RA-02 433MHz Signal Strength (RSSI & SNR Trend)</span>
           </div>
-          <span style="font-size:12px; color:var(--text-dim);">Live Telemetry Signal</span>
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div id="rfBufferingBadge" class="card-loading-badge" style="display:none;">
+              <span class="hist-spinner"></span> <span id="rfBufferingBadgeText">Fetching Diagnostics...</span>
+            </div>
+            <span style="font-size:12px; color:var(--text-dim);">Live Telemetry Signal</span>
+          </div>
+        </div>
+
+        <div class="history-controls" style="margin-bottom:16px;">
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div class="filter-pills" id="rfFilterPills">
+              <button class="filter-pill" id="rfPill1h" onclick="loadHistoryRange('1h')">1 Hour</button>
+              <button class="filter-pill" id="rfPill3h" onclick="loadHistoryRange('3h')">3 Hours</button>
+              <button class="filter-pill active" id="rfPill24h" onclick="loadHistoryRange('24h')">24 Hours</button>
+              <button class="filter-pill" id="rfPill3d" onclick="loadHistoryRange('3d')">Last 3 Days</button>
+              <button class="filter-pill" id="rfPill7d" onclick="loadHistoryRange('7d')">Last 7 Days</button>
+            </div>
+            <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; font-size:12px; font-weight:700; color:#ef4444; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.22); border-radius:8px;" title="Downtime & telemetry outages are highlighted with a continuous red dotted line on true chronological timeline">
+              <span style="display:inline-block; width:14px; border-top:2.5px dashed #ef4444;"></span> Gaps: Red Dotted Line
+            </span>
+          </div>
+
+          <div class="custom-date-group">
+            <label style="color:var(--text-muted); font-size:12.5px; font-weight:700;">Custom Date Range:</label>
+            <input type="date" id="rfHistoryStartDate" style="padding:7px 12px; border-radius:9px; border:1.5px solid #94a3b8; background:#ffffff; color:#0f172a; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color-scheme:light; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+            <span style="font-weight:700; color:var(--text-main);">to</span>
+            <input type="date" id="rfHistoryEndDate" style="padding:7px 12px; border-radius:9px; border:1.5px solid #94a3b8; background:#ffffff; color:#0f172a; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color-scheme:light; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+            <button class="btn btn-primary" style="padding:7px 18px; font-size:13px; font-weight:700; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="loadCustomHistory('rf')"><span>🔍</span> Search</button>
+          </div>
         </div>
 
         <div class="metrics-grid" style="margin-top:0; margin-bottom:18px;">
           <div class="metric-box">
             <span class="metric-label">Current LoRa RSSI</span>
-            <span id="rfTabRssi" class="metric-value">-78 dBm</span>
-            <span class="metric-sub" id="rfQualityLabel" style="color:var(--accent-green);">Quality: Excellent (> -85 dBm)</span>
+            <span id="rfTabRssi" class="metric-value">-- dBm</span>
+            <span class="metric-sub" id="rfQualityLabel" style="color:var(--text-muted);">Awaiting Telemetry...</span>
           </div>
           <div class="metric-box">
             <span class="metric-label">Current Signal-to-Noise Ratio (SNR)</span>
-            <span id="rfTabSnr" class="metric-value">+9.5 dB</span>
+            <span id="rfTabSnr" class="metric-value">-- dB</span>
             <span class="metric-sub">Noise Floor: Clean Link</span>
           </div>
         </div>
 
         <div class="chart-container-card">
+          <div id="rfLoadingOverlay" class="chart-loading-overlay" style="display:none;">
+            <div class="overlay-spinner"></div>
+            <span>Loading Signal Diagnostics...</span>
+          </div>
           <canvas id="rfSignalChart"></canvas>
         </div>
       </div>
@@ -3054,6 +3235,234 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
     let isNanoUnknown = false;
 
     // Charts
+    // =========================================================
+    // OFFLINE GAPS & DOWNTIME DISPLAY (Rule 15 Parity)
+    // Red Dotted Line across true chronological timeline is locked ON by default.
+    // =========================================================
+    const offlineGapMode = "dotted";
+    const joinOfflineGaps = true;
+    try { localStorage.setItem("offlineGapMode", "dotted"); } catch (e) {}
+    let currentHistoryLabel = '24h';
+    let cachedAllTodayRecords = [];
+    let currentOfflineFlags = [];
+    let currentOutageInfo = [];
+
+    // History Card Buffering & Loading State Management
+    function showHistoryLoadingState(label = "") {
+      const lblUpper = String(label || currentHistoryLabel || "").toUpperCase();
+      const text = lblUpper ? `Fetching ${lblUpper}...` : "Fetching Cloud Telemetry...";
+
+      const badge1 = document.getElementById("histBufferingBadge");
+      const badgeText1 = document.getElementById("histBufferingBadgeText");
+      if (badge1) {
+        badge1.style.display = "inline-flex";
+        if (badgeText1) badgeText1.textContent = text;
+      }
+
+      const badge2 = document.getElementById("rfBufferingBadge");
+      const badgeText2 = document.getElementById("rfBufferingBadgeText");
+      if (badge2) {
+        badge2.style.display = "inline-flex";
+        if (badgeText2) badgeText2.textContent = text;
+      }
+
+      const ol1 = document.getElementById("histLoadingOverlay");
+      if (ol1) {
+        ol1.style.display = "flex";
+        const olTxt = document.getElementById("histLoadingOverlayText");
+        if (olTxt) olTxt.textContent = `Loading ${lblUpper || 'Historical'} Telemetry...`;
+      }
+
+      const ol2 = document.getElementById("tempLoadingOverlay");
+      if (ol2) ol2.style.display = "flex";
+
+      const ol3 = document.getElementById("rfLoadingOverlay");
+      if (ol3) ol3.style.display = "flex";
+
+      const spanEl = document.getElementById("histTimeSpan");
+      if (spanEl) spanEl.textContent = `Loading ${lblUpper}...`;
+    }
+
+    function hideHistoryLoadingState() {
+      const badge1 = document.getElementById("histBufferingBadge");
+      if (badge1) badge1.style.display = "none";
+
+      const badge2 = document.getElementById("rfBufferingBadge");
+      if (badge2) badge2.style.display = "none";
+
+      const ol1 = document.getElementById("histLoadingOverlay");
+      if (ol1) ol1.style.display = "none";
+
+      const ol2 = document.getElementById("tempLoadingOverlay");
+      if (ol2) ol2.style.display = "none";
+
+      const ol3 = document.getElementById("rfLoadingOverlay");
+      if (ol3) ol3.style.display = "none";
+    }
+
+    function updateSpanGapsButtonUI() {}
+    function toggleJoinOfflineGaps() {}
+
+    // Chart.js Segment Styling Helpers for Dotted Red Line across NA / Outage spans
+    function getSegmentColor(ctx, defaultColor) {
+      if (offlineGapMode === 'dotted') {
+        const p0 = ctx.p0?.raw;
+        const p1 = ctx.p1?.raw;
+        if ((p0 && p0.isOffline) || (p1 && p1.isOffline) || currentOfflineFlags[ctx.p0DataIndex] || currentOfflineFlags[ctx.p1DataIndex]) {
+          return '#ef4444';
+        }
+      }
+      return defaultColor;
+    }
+
+    function getSegmentDash(ctx, defaultDash = []) {
+      if (offlineGapMode === 'dotted') {
+        const p0 = ctx.p0?.raw;
+        const p1 = ctx.p1?.raw;
+        if ((p0 && p0.isOffline) || (p1 && p1.isOffline) || currentOfflineFlags[ctx.p0DataIndex] || currentOfflineFlags[ctx.p1DataIndex]) {
+          return [6, 6];
+        }
+      }
+      return defaultDash;
+    }
+
+    function getSegmentWidth(ctx, defaultWidth = 2) {
+      if (offlineGapMode === 'dotted') {
+        const p0 = ctx.p0?.raw;
+        const p1 = ctx.p1?.raw;
+        if ((p0 && p0.isOffline) || (p1 && p1.isOffline) || currentOfflineFlags[ctx.p0DataIndex] || currentOfflineFlags[ctx.p1DataIndex]) {
+          return 2.2;
+        }
+      }
+      return defaultWidth;
+    }
+
+    // Dynamic Uniform Wall-Clock Time Step Calculation (Adapts to Desktop vs Mobile)
+    function calculateDynamicTimeStep(rangeMin, rangeMax) {
+      const diffMs = Math.max(60000, rangeMax - rangeMin);
+      const isMobile = window.innerWidth < 640;
+      const targetTicks = isMobile ? 6 : 12;
+      const rawStep = diffMs / targetTicks;
+
+      const steps = [
+        60 * 1000,           // 1 min
+        2 * 60 * 1000,       // 2 min
+        5 * 60 * 1000,       // 5 min
+        10 * 60 * 1000,      // 10 min
+        15 * 60 * 1000,      // 15 min
+        30 * 60 * 1000,      // 30 min
+        3600 * 1000,         // 1 hr
+        2 * 3600 * 1000,     // 2 hr
+        3 * 3600 * 1000,     // 3 hr
+        4 * 3600 * 1000,     // 4 hr
+        6 * 3600 * 1000,     // 6 hr
+        12 * 3600 * 1000,    // 12 hr
+        24 * 3600 * 1000,    // 1 day
+        2 * 24 * 3600 * 1000 // 2 days
+      ];
+
+      for (let s of steps) {
+        if (s >= rawStep * 0.82) return s;
+      }
+      return steps[steps.length - 1];
+    }
+
+    // Uniform Tick Formatter (Formats wall-clock rounded ticks cleanly across all timeframes)
+    function formatUniformTick(val, min, max) {
+      const d = new Date(val);
+      const span = (max && min && max > min) ? (max - min) : 86400000;
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const minStr = String(d.getMinutes()).padStart(2, '0');
+
+      if (span <= 6 * 3600 * 1000) {
+        // Up to 6 hours (1h, 3h): format as clean HH:mm (e.g. 09:05, 09:10)
+        return `${hh}:${minStr}`;
+      } else if (span <= 36 * 3600 * 1000) {
+        // 24 Hours / Today: show MM-DD HH:mm for multi-day clarity
+        return `${mm}-${dd} ${hh}:${minStr}`;
+      } else {
+        // Multi-day ranges (3d, 7d, custom): show MM-DD at midnight or MM-DD HH:mm
+        if (hh === '00' && minStr === '00') {
+          return `${mm}-${dd}`;
+        }
+        return `${mm}-${dd} ${hh}:${minStr}`;
+      }
+    }
+
+    function updateChartTimeScale(chart, minMs, maxMs, stepMs) {
+      if (!chart || !chart.options.scales.x) return;
+      chart.options.scales.x.type = 'linear';
+      chart.options.scales.x.min = minMs;
+      chart.options.scales.x.max = maxMs;
+      chart.options.scales.x.ticks.stepSize = stepMs;
+    }
+
+    function formatDurationMins(mins) {
+      if (!mins || mins <= 0) return "0m";
+      if (mins < 60) return mins + "m";
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      return m > 0 ? (h + "h " + m + "m") : (h + "h");
+    }
+
+    // Local Date String (YYYY-MM-DD) formatted in client timezone
+    function getLocalDateStr(dateObj = new Date()) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    // High-Precision Record Timestamp Parser (Handles 1899 epoch, ISO, and standard dates)
+    function parseRecordTimestamp(r) {
+      if (!r) return NaN;
+      if (r.timestamp && !isNaN(Number(r.timestamp))) return Number(r.timestamp);
+
+      let datePart = String(r.date || "").trim();
+      let timePart = String(r.time || "").trim();
+
+      // Clean 1899 timestamp distortion from Google Sheets pure time cells
+      if (timePart.indexOf("1899") !== -1 || timePart.length > 10) {
+        const timeMatch = timePart.match(/(\d{2}:\d{2}:\d{2})/);
+        if (timeMatch) timePart = timeMatch[1];
+      }
+
+      // Convert DD/MM/YYYY or DD-MM-YYYY to YYYY-MM-DD
+      const dMatchAlt = datePart.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
+      if (dMatchAlt) {
+        datePart = `${dMatchAlt[3]}-${dMatchAlt[2]}-${dMatchAlt[1]}`;
+      }
+
+      if (datePart && timePart) {
+        const tMatch = timePart.match(/^(\d{2}):(\d{2})(?::(\d{2}))?$/);
+        const dMatch = datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (tMatch && dMatch) {
+          const y = parseInt(dMatch[1], 10);
+          const m = parseInt(dMatch[2], 10) - 1;
+          const d = parseInt(dMatch[3], 10);
+          const hh = parseInt(tMatch[1], 10);
+          const mm = parseInt(tMatch[2], 10);
+          const ss = parseInt(tMatch[3] || "0", 10);
+          return new Date(y, m, d, hh, mm, ss).getTime();
+        }
+        const parsed = new Date(`${datePart}T${timePart}`).getTime();
+        if (!isNaN(parsed)) return parsed;
+      }
+
+      if (timePart) {
+        const tMatch = timePart.match(/^(\d{2}):(\d{2})(?::(\d{2}))?$/);
+        if (tMatch) {
+          const now = new Date();
+          now.setHours(parseInt(tMatch[1], 10), parseInt(tMatch[2], 10), parseInt(tMatch[3] || "0", 10), 0);
+          return now.getTime();
+        }
+      }
+
+      return NaN;
+    }
+
     let waterHistoryChartInstance = null;
     let waterTempChartInstance = null;
     let rfSignalChartInstance = null;
@@ -3214,7 +3623,12 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
       } else if (tabId === "telemetry") {
         setTimeout(() => {
           if (!rfSignalChartInstance) initRfSignalChart();
-          else rfSignalChartInstance.resize();
+          else {
+            rfSignalChartInstance.resize();
+            if (cachedHistoryData && cachedHistoryData.length > 0 && (!rfSignalChartInstance.data.datasets[0] || rfSignalChartInstance.data.datasets[0].data.length === 0)) {
+              renderHistoryToCharts(cachedHistoryData, currentHistoryLabel || '24h');
+            }
+          }
         }, 80);
       } else if (tabId === "settings") {
         fetchSettingsFromGAS(true);
@@ -3373,20 +3787,41 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
       const ringLitresDisplay = document.getElementById("ringLitresDisplay");
 
       // Water temperature elements in middle of jar & middle of ring
+      const vesselTempDisplay = document.getElementById("vesselTempDisplay");
       const vesselTempText = document.getElementById("vesselTempText");
+      const ringCenterTemp = document.getElementById("ringCenterTemp");
       const ringCenterTempText = document.getElementById("ringCenterTempText");
       const histCurrentTemp = document.getElementById("histCurrentTemp");
 
-      let tempHtml = "--°C";
-      if (isTempSensorFault) {
-        tempHtml = '<span style="color:#ef4444; font-weight:700; font-size:0.85em; text-shadow:0 0 8px rgba(239,68,68,0.5);">⚠️ SENSOR FAULT</span>';
-      } else if (currentWaterTemp !== null && !isNaN(currentWaterTemp)) {
-        tempHtml = `${Number(currentWaterTemp).toFixed(1)}°C`;
-      }
+      const hasValidTemp = !isTempSensorFault && currentWaterTemp !== null && !isNaN(currentWaterTemp);
 
-      if (vesselTempText) vesselTempText.innerHTML = tempHtml;
-      if (ringCenterTempText) ringCenterTempText.innerHTML = tempHtml;
-      if (histCurrentTemp) histCurrentTemp.innerHTML = tempHtml;
+      if (hasValidTemp) {
+        const formattedTemp = `${Number(currentWaterTemp).toFixed(1)}°C`;
+        if (vesselTempDisplay) vesselTempDisplay.style.display = "flex";
+        if (vesselTempText) vesselTempText.textContent = formattedTemp;
+        if (ringCenterTemp) ringCenterTemp.style.display = "flex";
+        if (ringCenterTempText) ringCenterTempText.textContent = formattedTemp;
+        if (histCurrentTemp) histCurrentTemp.textContent = formattedTemp;
+      } else {
+        // User rule: If sensor fault, don't write anything in the jar / ring display. Show temp ONLY if working.
+        if (vesselTempDisplay) vesselTempDisplay.style.display = "none";
+        if (vesselTempText) vesselTempText.textContent = "";
+        if (ringCenterTemp) ringCenterTemp.style.display = "none";
+        if (ringCenterTempText) ringCenterTempText.textContent = "";
+        if (histCurrentTemp) histCurrentTemp.textContent = "--°C";
+      }
+      const qualEl = document.getElementById("histTempQuality");
+      if (qualEl) {
+        if (isTempSensorFault || currentWaterTemp === null || isNaN(currentWaterTemp)) {
+          qualEl.innerHTML = '<span style="color:#ef4444; font-weight:700;">Sensor Offline / Fault</span>';
+        } else if (currentWaterTemp < 24.0) {
+          qualEl.innerHTML = '<span style="color:#38bdf8; font-weight:600;">Below Baseline (< 24°C)</span>';
+        } else if (currentWaterTemp <= 45.0) {
+          qualEl.innerHTML = '<span style="color:#10b981; font-weight:600;">Normal Range (24°C – 45°C)</span>';
+        } else {
+          qualEl.innerHTML = '<span style="color:#f59e0b; font-weight:600;">Thermal Excursion (> 45°C)</span>';
+        }
+      }
 
       // 1. Initial State before connection
       if (currentLevel === null) {
@@ -3399,73 +3834,98 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
         return;
       }
 
-      const lowWarn = document.getElementById("lowWaterWarn");
-      if (lowWarn) lowWarn.style.display = (Array.isArray(currentSensors) && currentSensors.length > 0 && !currentSensors.some(v => v === 1)) ? "flex" : "none";
-
-      // 2. Liquid Fluid Vessel Height & Color
-      if (fluid) {
-        fluid.style.height = `${currentLevel}%`;
-        fluid.classList.toggle("empty", currentLevel <= 0);
-        fluid.style.setProperty("--fluid-top", currentLevel <= criticalThreshold ? "#ef4444" : (currentLevel <= warningThreshold ? "#f59e0b" : "#38bdf8"));
-        if (currentLevel <= criticalThreshold) {
-          fluid.style.background = "linear-gradient(180deg, #ef4444 0%, #dc2626 50%, #7f1d1d 100%)";
-          fluid.style.boxShadow = "0 -8px 24px rgba(239, 68, 68, 0.6)";
-        } else if (currentLevel <= warningThreshold) {
-          fluid.style.background = "linear-gradient(180deg, #f59e0b 0%, #ea580c 50%, #9a3412 100%)";
-          fluid.style.boxShadow = "0 -8px 22px rgba(245, 158, 11, 0.55)";
-        } else {
-          fluid.style.background = "linear-gradient(180deg, #38bdf8 0%, #0284c7 45%, #1e40af 100%)";
-          fluid.style.boxShadow = "0 -8px 24px rgba(56, 189, 248, 0.5)";
-        }
-      }
-
-      const vols = calculateVolume(currentLevel);
-      levelDisplay.textContent = `${currentLevel}%`;
-      litresDisplay.textContent = `${vols.current.toLocaleString()} L`;
-      quickLitres.textContent = `${vols.current.toLocaleString()} L`;
-      ringCenterPct.textContent = `${currentLevel}%`;
-      ringLitresDisplay.textContent = `${vols.current.toLocaleString()} L`;
-
-      // Offline / connection issue: grey out the % readouts (Volumetric + RGB tabs)
       const anyOffline = !!(isOfficeNodeOffline || isPumpNodeOffline);
       levelDisplay.style.color = anyOffline ? "#9ca3af" : "";
       ringCenterPct.style.color = anyOffline ? "#9ca3af" : "";
 
+      const vol = calculateVolume(currentLevel);
+      if (levelDisplay) levelDisplay.textContent = `${currentLevel}%`;
+      if (litresDisplay) {
+        if (anyOffline) {
+          litresDisplay.textContent = isPumpNodeOffline ? "Transmitter Offline" : "Receiver Offline";
+        } else {
+          litresDisplay.textContent = `${vol.current.toLocaleString()} Litres`;
+        }
+      }
+      if (quickLitres) quickLitres.textContent = `${vol.current.toLocaleString()} L`;
+      if (ringCenterPct) ringCenterPct.textContent = `${currentLevel}%`;
+      if (ringLitresDisplay) ringLitresDisplay.textContent = `${vol.current.toLocaleString()} L`;
+
+      const lowWarn = document.getElementById("lowWaterWarn");
+      if (lowWarn) lowWarn.style.display = (!anyOffline && Array.isArray(currentSensors) && currentSensors.length > 0 && !currentSensors.some(v => v === 1)) ? "flex" : "none";
+
+      // 2. Liquid Fluid Vessel Height & Color (freeze & suppress animation when offline)
+      if (fluid) {
+        if (anyOffline) {
+          fluid.classList.add("empty");
+          fluid.style.opacity = "0.2";
+          fluid.style.filter = "grayscale(100%)";
+        } else {
+          fluid.style.opacity = "";
+          fluid.style.filter = "";
+          fluid.style.height = `${currentLevel}%`;
+          fluid.classList.toggle("empty", currentLevel <= 0);
+          fluid.style.setProperty("--fluid-top", currentLevel <= criticalThreshold ? "#ef4444" : (currentLevel <= warningThreshold ? "#f59e0b" : "#38bdf8"));
+          if (currentLevel <= criticalThreshold) {
+            fluid.style.background = "linear-gradient(180deg, #ef4444 0%, #dc2626 50%, #7f1d1d 100%)";
+            fluid.style.boxShadow = "0 -8px 24px rgba(239, 68, 68, 0.6)";
+          } else if (currentLevel <= warningThreshold) {
+            fluid.style.background = "linear-gradient(180deg, #f59e0b 0%, #ea580c 50%, #9a3412 100%)";
+            fluid.style.boxShadow = "0 -8px 22px rgba(245, 158, 11, 0.55)";
+          } else {
+            fluid.style.background = "linear-gradient(180deg, #38bdf8 0%, #0284c7 45%, #1e40af 100%)";
+            fluid.style.boxShadow = "0 -8px 24px rgba(56, 189, 248, 0.5)";
+          }
+        }
+      }
+
       // 3. Alarm State Evaluation
-      relayTriggered = (currentLevel <= criticalThreshold);
       const alarmBadge = document.getElementById("alarmBadge");
       const alarmStatusText = document.getElementById("alarmStatusText");
       const quickRelay = document.getElementById("quickRelay");
       const ringRelay = document.getElementById("ringRelayDisplay");
       const tankStateBadge = document.getElementById("tankLevelStateBadge");
 
-      if (relayTriggered) {
-        alarmBadge.className = "badge badge-danger";
-        alarmStatusText.textContent = `ALARM ACTIVE (CRITICAL <${criticalThreshold}%)`;
-        quickRelay.textContent = "ACTIVE (TRIGGERED)";
-        quickRelay.style.color = "var(--accent-red)";
-        ringRelay.textContent = "ACTIVE (TRIGGERED)";
-        ringRelay.style.color = "var(--accent-red)";
-        tankStateBadge.className = "badge badge-danger";
-        tankStateBadge.textContent = "LEVEL LOW (CRITICAL)";
-      } else if (currentLevel <= warningThreshold) {
+      if (anyOffline) {
+        relayTriggered = false;
         alarmBadge.className = "badge badge-warn";
-        alarmStatusText.textContent = `LEVEL MEDIUM (WARNING <${warningThreshold}%)`;
-        quickRelay.textContent = "STANDBY (OFF)";
+        alarmStatusText.textContent = isPumpNodeOffline ? "TRANSMITTER OFFLINE (NO SIGNAL)" : "RECEIVER OFFLINE (NO WI-FI)";
+        quickRelay.textContent = "LINK OFFLINE";
         quickRelay.style.color = "var(--accent-amber)";
-        ringRelay.textContent = "STANDBY (OFF)";
+        ringRelay.textContent = "LINK OFFLINE";
         ringRelay.style.color = "var(--accent-amber)";
         tankStateBadge.className = "badge badge-warn";
-        tankStateBadge.textContent = "WARNING: LEVEL MEDIUM";
+        tankStateBadge.textContent = isPumpNodeOffline ? "RF LINK LOST" : "RECEIVER OFFLINE";
       } else {
-        alarmBadge.className = "badge badge-live";
-        alarmStatusText.textContent = "ALARM STANDBY (NORMAL)";
-        quickRelay.textContent = "STANDBY (OFF)";
-        quickRelay.style.color = "var(--accent-green)";
-        ringRelay.textContent = "STANDBY (OFF)";
-        ringRelay.style.color = "var(--accent-green)";
-        tankStateBadge.className = "badge badge-live";
-        tankStateBadge.textContent = "NORMAL LEVEL";
+        relayTriggered = (currentLevel <= criticalThreshold);
+        if (relayTriggered) {
+          alarmBadge.className = "badge badge-danger";
+          alarmStatusText.textContent = `ALARM ACTIVE (CRITICAL <${criticalThreshold}%)`;
+          quickRelay.textContent = "ACTIVE (TRIGGERED)";
+          quickRelay.style.color = "var(--accent-red)";
+          ringRelay.textContent = "ACTIVE (TRIGGERED)";
+          ringRelay.style.color = "var(--accent-red)";
+          tankStateBadge.className = "badge badge-danger";
+          tankStateBadge.textContent = "LEVEL LOW (CRITICAL)";
+        } else if (currentLevel <= warningThreshold) {
+          alarmBadge.className = "badge badge-warn";
+          alarmStatusText.textContent = `LEVEL MEDIUM (WARNING <${warningThreshold}%)`;
+          quickRelay.textContent = "STANDBY (OFF)";
+          quickRelay.style.color = "var(--accent-amber)";
+          ringRelay.textContent = "STANDBY (OFF)";
+          ringRelay.style.color = "var(--accent-amber)";
+          tankStateBadge.className = "badge badge-warn";
+          tankStateBadge.textContent = "WARNING: LEVEL MEDIUM";
+        } else {
+          alarmBadge.className = "badge badge-live";
+          alarmStatusText.textContent = "ALARM STANDBY (NORMAL)";
+          quickRelay.textContent = "STANDBY (OFF)";
+          quickRelay.style.color = "var(--accent-green)";
+          ringRelay.textContent = "STANDBY (OFF)";
+          ringRelay.style.color = "var(--accent-green)";
+          tankStateBadge.className = "badge badge-live";
+          tankStateBadge.textContent = "NORMAL LEVEL";
+        }
       }
 
       const relayThresholdSub = document.getElementById("relayThresholdSub");
@@ -3475,11 +3935,11 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
       let faultDetected = (sensorFaultBits > 0);
       const faultSensorsArray = [];
 
-      // 0% red LED: steady red normally, fast blink when all sensors are dry (< 10%)
+      // 0% red LED: steady red normally, fast blink only when all sensors are genuinely dry (< 10%)
       {
         const b0 = document.getElementById("ladderBead-0"), p0 = document.querySelector("#ladderStep-0 .ladder-pct");
-        const allDry = Array.isArray(currentSensors) && currentSensors.length > 0 && !currentSensors.some(v => v === 1);
-        const veryLow = allDry || currentLevel < 10;
+        const allDry = !anyOffline && Array.isArray(currentSensors) && currentSensors.length > 0 && !currentSensors.some(v => v === 1);
+        const veryLow = allDry || (!anyOffline && currentLevel < 10);
         if (b0) b0.className = "ladder-bead " + (veryLow ? "zero-blink" : "zero-on");
         if (p0) p0.classList.toggle("zero-blink-txt", veryLow);
       }
@@ -3942,15 +4402,25 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
     // --- Offline look: grey readings + red flashing reason + grey LEDs ---
     let lastStaleKey = "";
     function applyOfflineStyle(fromUpdate) {
-      const msg = isOfficeNodeOffline ? "RECEIVER OFFLINE" : (isPumpNodeOffline ? "TRANSMITTER / LoRa OFFLINE" : "");
+      const msg = isOfficeNodeOffline ? "ERROR,  RECEIVER ISSUE" : (isPumpNodeOffline ? "ERROR,   TRANSMITTER  ISSUE" : "");
       const stale = !!msg;
       document.body.classList.toggle("node-offline", stale);
       const vt = document.getElementById("offlineTagVessel");
-      if (vt) { vt.textContent = msg; vt.style.display = stale ? "block" : "none"; }
+      if (vt) { 
+        vt.textContent = msg; 
+        vt.style.display = stale ? "block" : "none";
+        vt.style.color = "#ef4444";
+        vt.style.fontWeight = "800";
+        vt.style.fontSize = "13px";
+        vt.style.letterSpacing = "0.05em";
+      }
       const rs = document.getElementById("ringCenterStatus");
       if (rs) {
         rs.classList.toggle("off-flash", stale);
-        if (stale) rs.textContent = msg;
+        if (stale) {
+          rs.textContent = msg;
+          rs.style.color = "#ef4444";
+        }
       }
       if (msg !== lastStaleKey) {
         lastStaleKey = msg;
@@ -4101,23 +4571,48 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
         const ls = formattedTime.match(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})$/);
         if (ls) lastSeenMs = new Date(+ls[3], +ls[2] - 1, +ls[1], +ls[4], +ls[5], +ls[6]).getTime();
 
-        const rssi = Number(data.latest.loraRssi) || -78;
-        const snr = Number(data.latest.loraSnr) || 9.5;
-        document.getElementById("loraRssiDisplay").textContent = `${rssi} dBm`;
-        document.getElementById("loraSnrDisplay").textContent = `SNR: ${snr > 0 ? '+' : ''}${snr} dB`;
-        document.getElementById("rfTabRssi").textContent = `${rssi} dBm`;
-        document.getElementById("rfTabSnr").textContent = `${snr > 0 ? '+' : ''}${snr} dB`;
+        const rssi = (data.latest.rssi !== undefined && data.latest.rssi !== null) ? Number(data.latest.rssi) : ((data.latest.loraRssi !== undefined && data.latest.loraRssi !== null) ? Number(data.latest.loraRssi) : 0);
+        const snr = (data.latest.snr !== undefined && data.latest.snr !== null) ? Number(data.latest.snr) : ((data.latest.loraSnr !== undefined && data.latest.loraSnr !== null) ? Number(data.latest.loraSnr) : 0);
+        window.currentRssi = rssi;
+        window.currentSnr = snr;
 
-        const rfQuality = document.getElementById("rfQualityLabel");
-        if (rssi > -85) {
-          rfQuality.textContent = "Quality: Excellent (> -85 dBm)";
-          rfQuality.style.color = "var(--accent-green)";
-        } else if (rssi > -105) {
-          rfQuality.textContent = "Quality: Good (-85 to -105 dBm)";
-          rfQuality.style.color = "var(--accent-amber)";
+        if (rssi === 0 && snr === 0) {
+          document.getElementById("loraRssiDisplay").textContent = `0 dBm (No Signal)`;
+          document.getElementById("loraSnrDisplay").textContent = `SNR: 0 dB`;
+          document.getElementById("rfTabRssi").textContent = `0 dBm (No Signal)`;
+          document.getElementById("rfTabSnr").textContent = `SNR: 0 dB`;
+          const rfQuality = document.getElementById("rfQualityLabel");
+          if (rfQuality) {
+            rfQuality.textContent = "LoRa Issue (Transmitter Offline / 0 dBm)";
+            rfQuality.style.color = "var(--accent-red)";
+          }
+          isPumpNodeOffline = true;
         } else {
-          rfQuality.textContent = "Quality: Weak (< -105 dBm)";
-          rfQuality.style.color = "var(--accent-red)";
+          document.getElementById("loraRssiDisplay").textContent = `${rssi} dBm`;
+          document.getElementById("loraSnrDisplay").textContent = `SNR: ${snr > 0 ? '+' : ''}${snr} dB`;
+          document.getElementById("rfTabRssi").textContent = `${rssi} dBm`;
+          document.getElementById("rfTabSnr").textContent = `${snr > 0 ? '+' : ''}${snr} dB`;
+
+          const rfQuality = document.getElementById("rfQualityLabel");
+          if (rfQuality) {
+            if (rssi > -85) {
+              rfQuality.textContent = "Quality: Excellent (> -85 dBm)";
+              rfQuality.style.color = "var(--accent-green)";
+            } else if (rssi > -105) {
+              rfQuality.textContent = "Quality: Good (-85 to -105 dBm)";
+              rfQuality.style.color = "var(--accent-amber)";
+            } else {
+              rfQuality.textContent = "Quality: Weak (< -105 dBm)";
+              rfQuality.style.color = "var(--accent-red)";
+            }
+          }
+        }
+
+        if (data.receiverIssue === true || data.isReceiverOnline === false) {
+          isOfficeNodeOffline = true;
+        }
+        if (data.transmitterIssue === true || data.isTransmitterOnline === false) {
+          isPumpNodeOffline = true;
         }
 
         updateUI();
@@ -4234,7 +4729,13 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
               fill: true,
               tension: 0.35,
               borderWidth: 2.5,
-              yAxisID: 'yLevel'
+              yAxisID: 'yLevel',
+              spanGaps: (offlineGapMode !== "disconnected"),
+              segment: {
+                borderColor: ctx => getSegmentColor(ctx, '#0284c7'),
+                borderDash: ctx => getSegmentDash(ctx),
+                borderWidth: ctx => getSegmentWidth(ctx, 2.5)
+              }
             },
             {
               label: 'Reserve (Litres)',
@@ -4243,21 +4744,47 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
               borderDash: [4, 4],
               tension: 0.35,
               borderWidth: 1.8,
-              yAxisID: 'yLitres'
+              yAxisID: 'yLitres',
+              spanGaps: (offlineGapMode !== "disconnected"),
+              segment: {
+                borderColor: ctx => getSegmentColor(ctx, '#10b981'),
+                borderDash: ctx => getSegmentDash(ctx, [4, 4]),
+                borderWidth: ctx => getSegmentWidth(ctx, 1.8)
+              }
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
           plugins: {
             legend: {
               labels: { color: textColor, font: { family: 'Inter', size: 12 } }
             },
             tooltip: {
               callbacks: {
+                title: function(items) {
+                  if (!items || !items.length) return '';
+                  const raw = items[0].raw;
+                  const xVal = (raw && raw.x !== undefined) ? raw.x : items[0].parsed?.x;
+                  if (!xVal) return '';
+                  const d = new Date(xVal);
+                  const mm = String(d.getMonth() + 1).padStart(2, '0');
+                  const dd = String(d.getDate()).padStart(2, '0');
+                  const hh = String(d.getHours()).padStart(2, '0');
+                  const min = String(d.getMinutes()).padStart(2, '0');
+                  const ss = String(d.getSeconds()).padStart(2, '0');
+                  return `${mm}-${dd} ${hh}:${min}:${ss}`;
+                },
                 label: function(context) {
+                  const raw = context.raw;
+                  if (raw && raw.isOffline) {
+                    return ` 🚨 OFFLINE (NA) • ${raw.outageInfo || 'No Telemetry'}`;
+                  }
+                  if (context.parsed.y === null || context.parsed.y === undefined || isNaN(context.parsed.y)) {
+                    return ' Node Offline (No Telemetry)';
+                  }
                   if (context.dataset.yAxisID === 'yLevel') {
                     return ` Level: ${context.parsed.y}%`;
                   } else {
@@ -4269,8 +4796,17 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
           },
           scales: {
             x: {
+              type: 'linear',
               grid: { color: gridColor },
-              ticks: { color: textColor, maxTicksLimit: 12, font: { family: 'JetBrains Mono', size: 10 } }
+              ticks: {
+                color: textColor,
+                font: { family: 'JetBrains Mono', size: 10 },
+                callback: function(val) {
+                  const min = (this && this.min !== undefined) ? this.min : 0;
+                  const max = (this && this.max !== undefined) ? this.max : 0;
+                  return formatUniformTick(val, min, max);
+                }
+              }
             },
             yLevel: {
               type: 'linear',
@@ -4290,7 +4826,7 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
         }
       });
 
-      loadHistoryRange('today');
+      loadHistoryRange('24h');
     }
 
     // --- Chart.js DEDICATED WATER TEMPERATURE CHART ---
@@ -4317,21 +4853,47 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
               borderWidth: 2.4,
               pointRadius: 2.5,
               pointHoverRadius: 5,
-              pointBackgroundColor: '#ea580c'
+              pointBackgroundColor: '#ea580c',
+              spanGaps: (offlineGapMode !== "disconnected"),
+              segment: {
+                borderColor: ctx => getSegmentColor(ctx, '#f59e0b'),
+                borderDash: ctx => getSegmentDash(ctx),
+                borderWidth: ctx => getSegmentWidth(ctx, 2.4)
+              }
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
           plugins: {
             legend: {
               labels: { color: textColor, font: { family: 'Inter', size: 12 } }
             },
             tooltip: {
               callbacks: {
+                title: function(items) {
+                  if (!items || !items.length) return '';
+                  const raw = items[0].raw;
+                  const xVal = (raw && raw.x !== undefined) ? raw.x : items[0].parsed?.x;
+                  if (!xVal) return '';
+                  const d = new Date(xVal);
+                  const mm = String(d.getMonth() + 1).padStart(2, '0');
+                  const dd = String(d.getDate()).padStart(2, '0');
+                  const hh = String(d.getHours()).padStart(2, '0');
+                  const min = String(d.getMinutes()).padStart(2, '0');
+                  const ss = String(d.getSeconds()).padStart(2, '0');
+                  return `${mm}-${dd} ${hh}:${min}:${ss}`;
+                },
                 label: function(context) {
+                  const raw = context.raw;
+                  if (raw && raw.isOffline) {
+                    return ` 🚨 OFFLINE (NA) • ${raw.outageInfo || 'No Telemetry'}`;
+                  }
+                  if (context.parsed.y === null || isNaN(context.parsed.y)) {
+                    return ' Sensor Fault / Disconnected';
+                  }
                   return ` Water Temp: ${context.parsed.y.toFixed(1)}°C`;
                 }
               }
@@ -4339,8 +4901,17 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
           },
           scales: {
             x: {
+              type: 'linear',
               grid: { color: gridColor },
-              ticks: { color: textColor, maxTicksLimit: 12, font: { family: 'JetBrains Mono', size: 10 } }
+              ticks: {
+                color: textColor,
+                font: { family: 'JetBrains Mono', size: 10 },
+                callback: function(val) {
+                  const min = (this && this.min !== undefined) ? this.min : 0;
+                  const max = (this && this.max !== undefined) ? this.max : 0;
+                  return formatUniformTick(val, min, max);
+                }
+              }
             },
             y: {
               type: 'linear',
@@ -4373,7 +4944,13 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
               fill: true,
               tension: 0.3,
               borderWidth: 2,
-              yAxisID: 'yRssi'
+              yAxisID: 'yRssi',
+              spanGaps: (offlineGapMode !== "disconnected"),
+              segment: {
+                borderColor: ctx => getSegmentColor(ctx, '#0284c7'),
+                borderDash: ctx => getSegmentDash(ctx),
+                borderWidth: ctx => getSegmentWidth(ctx, 2.2)
+              }
             },
             {
               label: 'SNR (dB)',
@@ -4381,20 +4958,67 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
               borderColor: '#10b981',
               tension: 0.3,
               borderWidth: 2,
-              yAxisID: 'ySnr'
+              yAxisID: 'ySnr',
+              spanGaps: (offlineGapMode !== "disconnected"),
+              segment: {
+                borderColor: ctx => getSegmentColor(ctx, '#10b981'),
+                borderDash: ctx => getSegmentDash(ctx),
+                borderWidth: ctx => getSegmentWidth(ctx, 2.2)
+              }
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
           plugins: {
-            legend: { labels: { color: textColor } }
+            legend: { labels: { color: textColor } },
+            tooltip: {
+              callbacks: {
+                title: function(items) {
+                  if (!items || !items.length) return '';
+                  const raw = items[0].raw;
+                  const xVal = (raw && raw.x !== undefined) ? raw.x : items[0].parsed?.x;
+                  if (!xVal) return '';
+                  const d = new Date(xVal);
+                  const mm = String(d.getMonth() + 1).padStart(2, '0');
+                  const dd = String(d.getDate()).padStart(2, '0');
+                  const hh = String(d.getHours()).padStart(2, '0');
+                  const min = String(d.getMinutes()).padStart(2, '0');
+                  const ss = String(d.getSeconds()).padStart(2, '0');
+                  return `${mm}-${dd} ${hh}:${min}:${ss}`;
+                },
+                label: function(context) {
+                  const raw = context.raw;
+                  if (raw && raw.isOffline) {
+                    return ` 🚨 OFFLINE (NA) • ${raw.outageInfo || 'No Telemetry'}`;
+                  }
+                  if (context.parsed.y === null || isNaN(context.parsed.y)) {
+                    return ' No Signal';
+                  }
+                  if (context.dataset.yAxisID === 'yRssi') {
+                    return ` LoRa RSSI: ${context.parsed.y} dBm`;
+                  } else {
+                    return ` SNR: ${context.parsed.y > 0 ? '+' : ''}${context.parsed.y.toFixed(1)} dB`;
+                  }
+                }
+              }
+            }
           },
           scales: {
             x: {
+              type: 'linear',
               grid: { color: gridColor },
-              ticks: { color: textColor, maxTicksLimit: 12, font: { family: 'JetBrains Mono', size: 10 } }
+              ticks: {
+                color: textColor,
+                font: { family: 'JetBrains Mono', size: 10 },
+                callback: function(val) {
+                  const min = (this && this.min !== undefined) ? this.min : 0;
+                  const max = (this && this.max !== undefined) ? this.max : 0;
+                  return formatUniformTick(val, min, max);
+                }
+              }
             },
             yRssi: {
               type: 'linear',
@@ -4415,6 +5039,11 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
           }
         }
       });
+
+      // Immediate in-memory render if cached history data exists
+      if (cachedHistoryData && cachedHistoryData.length > 0) {
+        renderHistoryToCharts(cachedHistoryData, currentHistoryLabel || '24h');
+      }
     }
 
     function updateChartTheme(chart) {
@@ -4446,190 +5075,652 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
     // --- Load Historical Data from Google Drive / Today Sheet ---
     async function loadHistoryRange(range) {
       document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
-      if (range === 'today') document.getElementById("pillToday").classList.add("active");
-      if (range === '3d') document.getElementById("pill3d").classList.add("active");
-      if (range === '7d') document.getElementById("pill7d").classList.add("active");
+      const syncPills = (id1, id2) => {
+        const p1 = document.getElementById(id1); if (p1) p1.classList.add("active");
+        const p2 = document.getElementById(id2); if (p2) p2.classList.add("active");
+      };
 
-      const now = new Date();
-      let startDateStr = "";
-      const endDateStr = now.toISOString().split("T")[0];
+      if (range === '1h') syncPills("pill1h", "rfPill1h");
+      else if (range === '3h') syncPills("pill3h", "rfPill3h");
+      else if (range === '24h' || range === 'today') {
+        syncPills("pill24h", "rfPill24h");
+        const pt = document.getElementById("pillToday"); if (pt) pt.classList.add("active");
+      }
+      else if (range === '3d') syncPills("pill3d", "rfPill3d");
+      else if (range === '7d') syncPills("pill7d", "rfPill7d");
 
-      if (range === 'today') {
-        startDateStr = endDateStr;
-      } else if (range === '3d') {
-        const d = new Date(now.getTime() - (3 * 24 * 3600 * 1000));
-        startDateStr = d.toISOString().split("T")[0];
-      } else if (range === '7d') {
-        const d = new Date(now.getTime() - (7 * 24 * 3600 * 1000));
-        startDateStr = d.toISOString().split("T")[0];
+      // Show buffering state while historical data is prepared or fetched
+      showHistoryLoadingState(range);
+
+      // Instant RAM Slice: If today's records are cached in memory, slice immediately (0ms latency!)
+      if ((range === '1h' || range === '3h' || range === '24h' || range === 'today') && cachedAllTodayRecords && cachedAllTodayRecords.length > 0) {
+        if (range === '1h' || range === '3h') {
+          const hours = range === '1h' ? 1 : 3;
+          const cutoff = Date.now() - (hours * 3600 * 1000);
+          const filtered = cachedAllTodayRecords.filter(r => {
+            const t = parseRecordTimestamp(r);
+            return !isNaN(t) && t >= cutoff;
+          });
+          if (filtered.length > 0) {
+            renderHistoryToCharts(filtered, range);
+            return;
+          }
+        } else {
+          renderHistoryToCharts(cachedAllTodayRecords, '24h');
+          return;
+        }
       }
 
-      await fetchHistoryFromGAS(startDateStr, endDateStr, range);
+      const now = new Date();
+      const todayDateStr = getLocalDateStr(now);
+      let startDateStr = todayDateStr;
+      const endDateStr = todayDateStr;
+
+      if (range === '1h' || range === '3h' || range === '24h' || range === 'today') {
+        startDateStr = todayDateStr;
+      } else if (range === '3d') {
+        const d = new Date(now.getTime() - (3 * 24 * 3600 * 1000));
+        startDateStr = getLocalDateStr(d);
+      } else if (range === '7d') {
+        const d = new Date(now.getTime() - (7 * 24 * 3600 * 1000));
+        startDateStr = getLocalDateStr(d);
+      }
+
+      await fetchHistoryFromGAS(startDateStr, endDateStr, range, range);
     }
 
-    function loadCustomHistory() {
-      const start = document.getElementById("historyStartDate").value;
-      const end = document.getElementById("historyEndDate").value;
+    function loadCustomHistory(source = 'hist') {
+      let start, end;
+      if (source === 'rf') {
+        start = document.getElementById("rfHistoryStartDate").value;
+        end = document.getElementById("rfHistoryEndDate").value;
+      } else {
+        start = document.getElementById("historyStartDate").value;
+        end = document.getElementById("historyEndDate").value;
+      }
       if (!start) {
         alert("Please pick a Start Date.");
         return;
       }
+      showHistoryLoadingState('custom');
       document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
-      fetchHistoryFromGAS(start, end || start, 'custom');
+      fetchHistoryFromGAS(start, end || start, 'custom', 'custom');
     }
 
-    async function fetchHistoryFromGAS(startDate, endDate, label) {
-      const url = document.getElementById("cfgGasUrl").value.trim();
+    async function fetchHistoryFromGAS(startDate, endDate, label, range = "") {
+      const url = document.getElementById("cfgGasUrl").value.trim() || gasUrl || "https://script.google.com/macros/s/AKfycbwVkINv6i9tNlABwhfJzG23EjOUzESWldwGxqvqRx3nV3kS35oa-VP3QzCoQob39B7u/exec";
       if (!url) return;
 
+      showHistoryLoadingState(label);
+
       try {
-        const query = `${url}?action=getHistory&startDate=${startDate}&endDate=${endDate}&limit=1200`;
+        const query = `${url}?action=getHistory&startDate=${startDate}&endDate=${endDate}&range=${encodeURIComponent(range || label)}&limit=1500`;
         const resp = await fetch(query);
         const res = await resp.json();
 
         if (res.status === "ok" && Array.isArray(res.history)) {
+          const todayIso = getLocalDateStr();
+          if (startDate === todayIso || range === '1h' || range === '3h' || range === '24h' || range === 'today') {
+            cachedAllTodayRecords = res.history;
+          }
           cachedHistoryData = res.history;
-          renderHistoryToCharts(res.history, label);
+
+          if (range === '1h' || range === '3h') {
+            const hours = range === '1h' ? 1 : 3;
+            const cutoff = Date.now() - (hours * 3600 * 1000);
+            const filtered = res.history.filter(r => {
+              const t = parseRecordTimestamp(r);
+              return !isNaN(t) && t >= cutoff;
+            });
+            renderHistoryToCharts(filtered.length > 0 ? filtered : res.history, label);
+          } else {
+            renderHistoryToCharts(res.history, label);
+          }
         } else {
-          generateFallbackHistoryData(label);
+          renderHistoryToCharts([], label);
         }
       } catch (e) {
-        console.warn("History fetch failed, using fallback: ", e);
-        generateFallbackHistoryData(label);
+        console.warn("History fetch error: ", e);
+        if (cachedAllTodayRecords && cachedAllTodayRecords.length > 0) {
+          renderHistoryToCharts(cachedAllTodayRecords, label);
+        } else {
+          renderHistoryToCharts([], label);
+        }
+      } finally {
+        hideHistoryLoadingState();
       }
     }
 
     function renderHistoryToCharts(records, label) {
       if (!records || records.length === 0) {
-        generateFallbackHistoryData(label);
+        if (waterHistoryChartInstance) {
+          waterHistoryChartInstance.data.labels = [];
+          waterHistoryChartInstance.data.datasets[0].data = [];
+          waterHistoryChartInstance.data.datasets[1].data = [];
+          waterHistoryChartInstance.update();
+        }
+        if (waterTempChartInstance) {
+          waterTempChartInstance.data.labels = [];
+          waterTempChartInstance.data.datasets[0].data = [];
+          waterTempChartInstance.update();
+        }
+        if (rfSignalChartInstance) {
+          rfSignalChartInstance.data.labels = [];
+          rfSignalChartInstance.data.datasets[0].data = [];
+          rfSignalChartInstance.data.datasets[1].data = [];
+          rfSignalChartInstance.update();
+        }
+        document.getElementById("histPeakLevel").textContent = "--%";
+        document.getElementById("histPeakLitres").textContent = "-- L";
+        document.getElementById("histMinLevel").textContent = "--%";
+        document.getElementById("histMinLitres").textContent = "-- L";
+        document.getElementById("histAvgLevel").textContent = "--%";
+        document.getElementById("histAvgLitres").textContent = "-- L";
+        document.getElementById("histTotalPoints").textContent = "0";
+        document.getElementById("histPeakTemp").textContent = "--°C";
+        document.getElementById("histMinTemp").textContent = "--°C";
+        document.getElementById("histAvgTemp").textContent = "--°C";
+        document.getElementById("histTimeSpan").textContent = `Span: ${label.toUpperCase()}`;
+
+        const tbody = document.getElementById("outageTableBody");
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="padding:18px; text-align:center; color:var(--text-muted);">No records available for this period.</td></tr>';
+        hideHistoryLoadingState();
         return;
       }
 
-      const labels = [];
-      const levels = [];
-      const litres = [];
-      const temps = [];
-      const rssi = [];
-      const snr = [];
+      // Sort records chronologically to guarantee correct order
+      records.sort((a, b) => {
+        const ta = parseRecordTimestamp(a);
+        const tb = parseRecordTimestamp(b);
+        return (isNaN(ta) ? 0 : ta) - (isNaN(tb) ? 0 : tb);
+      });
+
+      const nowMs = Date.now();
+      let lastRecordMs = nowMs;
+      let firstRecordMs = nowMs;
+      for (let i = records.length - 1; i >= 0; i--) {
+        const t = parseRecordTimestamp(records[i]);
+        if (!isNaN(t)) { lastRecordMs = t; break; }
+      }
+      for (let i = 0; i < records.length; i++) {
+        const t = parseRecordTimestamp(records[i]);
+        if (!isNaN(t)) { firstRecordMs = t; break; }
+      }
+
+      // Establish timeline bounds based on selected view filter
+      let rangeMin = nowMs - (24 * 3600 * 1000);
+      let rangeMax = Math.max(nowMs, lastRecordMs);
+
+      if (label === '1h') {
+        rangeMax = Math.max(nowMs, lastRecordMs);
+        rangeMin = rangeMax - (1 * 3600 * 1000);
+      } else if (label === '3h') {
+        rangeMax = Math.max(nowMs, lastRecordMs);
+        rangeMin = rangeMax - (3 * 3600 * 1000);
+      } else if (label === '24h' || label === 'today') {
+        rangeMax = Math.max(nowMs, lastRecordMs);
+        rangeMin = rangeMax - (24 * 3600 * 1000);
+      } else if (label === '3d') {
+        rangeMax = Math.max(nowMs, lastRecordMs);
+        rangeMin = rangeMax - (3 * 24 * 3600 * 1000);
+      } else if (label === '7d') {
+        rangeMax = Math.max(nowMs, lastRecordMs);
+        rangeMin = rangeMax - (7 * 24 * 3600 * 1000);
+      } else if (label === 'custom') {
+        const startInput = document.getElementById("historyStartDate")?.value || document.getElementById("rfHistoryStartDate")?.value;
+        const endInput = document.getElementById("historyEndDate")?.value || document.getElementById("rfHistoryEndDate")?.value;
+        if (startInput) {
+          rangeMin = new Date(`${startInput}T00:00:00`).getTime();
+          rangeMax = endInput ? new Date(`${endInput}T23:59:59`).getTime() : (rangeMin + 24 * 3600 * 1000);
+        } else {
+          rangeMin = firstRecordMs;
+          rangeMax = lastRecordMs;
+        }
+      }
+
+      const stepSize = calculateDynamicTimeStep(rangeMin, rangeMax);
+      const tzOffsetMs = new Date().getTimezoneOffset() * 60000;
+      const localMin = rangeMin - tzOffsetMs;
+      const localMax = rangeMax - tzOffsetMs;
+      const alignedMin = Math.floor(localMin / stepSize) * stepSize + tzOffsetMs;
+      const alignedMax = Math.ceil(localMax / stepSize) * stepSize + tzOffsetMs;
+
+      const levelPoints = [];
+      const litresPoints = [];
+      const tempPoints = [];
+      const rssiPoints = [];
+      const snrPoints = [];
+
+      currentOfflineFlags = [];
+      currentOutageInfo = [];
 
       let peak = 0;
       let min = 100;
       let sum = 0;
+      let validLevelCount = 0;
 
       let peakTemp = -999;
       let minTemp = 999;
       let sumTemp = 0;
       let validTempCount = 0;
-      let lastValidHistTemp = null;
 
-      const fallbackBaseTemp = (currentWaterTemp !== null && !isNaN(currentWaterTemp)) ? currentWaterTemp : 28.5;
+      currentHistoryLabel = label;
+      cachedHistoryData = records;
+
+      let lastValidLevel = null;
+      let lastValidLitres = null;
+      let lastValidTemp = null;
+      let lastValidRssi = null;
+      let lastValidSnr = null;
+
+      // Scan for baseline values
+      for (let i = 0; i < records.length; i++) {
+        const item = records[i];
+        if (lastValidLevel === null && item.levelPct !== null && item.levelPct !== "N/A" && !isNaN(Number(item.levelPct))) {
+          lastValidLevel = Number(item.levelPct);
+          lastValidLitres = (item.litres && !isNaN(Number(item.litres))) ? Number(item.litres) : calculateVolume(lastValidLevel).current;
+        }
+        if (lastValidTemp === null && item.temperatureC !== null && item.temperatureC !== "N/A" && !isNaN(Number(item.temperatureC))) {
+          lastValidTemp = Number(item.temperatureC);
+        }
+        if (lastValidRssi === null && item.rssi !== null && item.rssi !== 0 && !isNaN(Number(item.rssi))) {
+          lastValidRssi = Number(item.rssi);
+          lastValidSnr = (item.snr !== null && !isNaN(Number(item.snr))) ? Number(item.snr) : 9.0;
+        }
+      }
+      if (lastValidLevel === null) { lastValidLevel = 50; lastValidLitres = calculateVolume(50).current; }
+      if (lastValidTemp === null) lastValidTemp = 28.5;
+      if (lastValidRssi === null) { lastValidRssi = -106; lastValidSnr = 9.0; }
 
       records.forEach((r, idx) => {
-        const timeLabel = r.time ? r.time.slice(0, 5) : "";
-        labels.push(r.date ? `${r.date.slice(5)} ${timeLabel}` : timeLabel);
-        const lvl = Number(r.levelPct) || 0;
-        const lit = Number(r.litres) || 0;
-        levels.push(lvl);
-        litres.push(lit);
-        rssi.push(Number(r.rssi) || -78);
-        snr.push(Number(r.snr) || 9.5);
+        const t = parseRecordTimestamp(r);
+        if (isNaN(t)) return;
 
-        // Water Temperature parsing with Outlier & Drop-to-Zero Filtering
-        let tVal = null;
-        if (r.temperatureC !== undefined && r.temperatureC !== null && r.temperatureC !== "") {
-          const num = Number(r.temperatureC);
-          // Reject drops to 0.0°C and transient electrical spikes (> 60°C or <= 5°C)
-          if (!isNaN(num) && num > 5.0 && num < 60.0) {
-            tVal = num;
-            lastValidHistTemp = num;
-          } else if (lastValidHistTemp !== null) {
-            tVal = lastValidHistTemp; // Carry forward last valid temperature across noise gaps
+        // Gap detection between consecutive records:
+        // If consecutive records are separated by >= 5 minutes, an outage occurred (ESP32 Gateway / Power loss)!
+        // Seamlessly handles breaks (disconnected) or red dotted bridges on true chronological time!
+        if (idx > 0) {
+          const prev = records[idx - 1];
+          const tPrev = parseRecordTimestamp(prev);
+          if (!isNaN(tPrev) && t > tPrev) {
+            const diffMin = Math.round((t - tPrev) / 60000);
+            if (diffMin >= 5) {
+              const durText = formatDurationMins(diffMin);
+              const outageReason = `Office ESP32 Outage (${durText})`;
+
+              levelPoints.push({ x: tPrev + 1000, y: lastValidLevel, isOffline: true, outageInfo: outageReason });
+              litresPoints.push({ x: tPrev + 1000, y: lastValidLitres, isOffline: true, outageInfo: outageReason });
+              tempPoints.push({ x: tPrev + 1000, y: lastValidTemp, isOffline: true, outageInfo: outageReason });
+              rssiPoints.push({ x: tPrev + 1000, y: lastValidRssi, isOffline: true, outageInfo: outageReason });
+              snrPoints.push({ x: tPrev + 1000, y: lastValidSnr, isOffline: true, outageInfo: outageReason });
+
+              levelPoints.push({ x: t - 1000, y: lastValidLevel, isOffline: true, outageInfo: outageReason });
+              litresPoints.push({ x: t - 1000, y: lastValidLitres, isOffline: true, outageInfo: outageReason });
+              tempPoints.push({ x: t - 1000, y: lastValidTemp, isOffline: true, outageInfo: outageReason });
+              rssiPoints.push({ x: t - 1000, y: lastValidRssi, isOffline: true, outageInfo: outageReason });
+              snrPoints.push({ x: t - 1000, y: lastValidSnr, isOffline: true, outageInfo: outageReason });
+            }
           }
         }
-        if (tVal === null) {
-          tVal = lastValidHistTemp !== null ? lastValidHistTemp : fallbackBaseTemp;
-        }
-        temps.push(tVal);
 
-        if (tVal !== null && !isNaN(tVal)) {
-          if (tVal > peakTemp) peakTemp = tVal;
-          if (tVal < minTemp) minTemp = tVal;
-          sumTemp += tVal;
-          validTempCount++;
-        }
+        // Strict Offline Handling: If Nano is offline or row is N/A (Red Dotted Line Bridge)
+        const isNa = (r.isNanoOffline === true || r.levelPct === null || r.levelPct === "N/A" || String(r.sensorFaults || "").indexOf("NANO OFFLINE") !== -1);
+        if (isNa) {
+          const nanoOutageReason = "Field Tank Nano (TX) Offline [NA]";
+          levelPoints.push({ x: t, y: lastValidLevel, isOffline: true, outageInfo: nanoOutageReason });
+          litresPoints.push({ x: t, y: lastValidLitres, isOffline: true, outageInfo: nanoOutageReason });
+          tempPoints.push({ x: t, y: lastValidTemp, isOffline: true, outageInfo: nanoOutageReason });
+          rssiPoints.push({ x: t, y: lastValidRssi, isOffline: true, outageInfo: nanoOutageReason });
+          snrPoints.push({ x: t, y: lastValidSnr, isOffline: true, outageInfo: nanoOutageReason });
+        } else {
+          let lvl = null;
+          let lit = null;
+          if (r.levelPct !== null && r.levelPct !== undefined && r.levelPct !== "") {
+            const parsedLvl = Number(r.levelPct);
+            if (!isNaN(parsedLvl)) {
+              lvl = parsedLvl;
+              lit = (r.litres !== null && r.litres !== undefined && r.litres !== "" && !isNaN(Number(r.litres))) 
+                    ? Number(r.litres) 
+                    : calculateVolume(lvl).current;
+              lastValidLevel = lvl;
+              lastValidLitres = lit;
+            }
+          }
+          levelPoints.push({ x: t, y: lvl });
+          litresPoints.push({ x: t, y: lit });
 
-        if (lvl > peak) peak = lvl;
-        if (lvl < min) min = lvl;
-        sum += lvl;
+          let rVal = null;
+          let sVal = null;
+          if (r.rssi !== null && r.rssi !== undefined && r.rssi !== "" && !isNaN(Number(r.rssi))) {
+            const parsedRssi = Number(r.rssi);
+            if (parsedRssi !== 0) {
+              rVal = parsedRssi;
+              lastValidRssi = rVal;
+            }
+          }
+          if (r.snr !== null && r.snr !== undefined && r.snr !== "" && !isNaN(Number(r.snr))) {
+            const parsedSnr = Number(r.snr);
+            if (parsedSnr !== 0) {
+              sVal = parsedSnr;
+              lastValidSnr = sVal;
+            }
+          }
+          rssiPoints.push({ x: t, y: rVal });
+          snrPoints.push({ x: t, y: sVal });
+
+          let tVal = null;
+          if (r.temperatureC !== undefined && r.temperatureC !== null && r.temperatureC !== "") {
+            const num = Number(r.temperatureC);
+            if (!isNaN(num) && num >= 0.0 && num <= 80.0) {
+              tVal = num;
+              lastValidTemp = tVal;
+            }
+          }
+          tempPoints.push({ x: t, y: tVal });
+
+          if (lvl !== null) {
+            if (lvl > peak) peak = lvl;
+            if (lvl < min) min = lvl;
+            sum += lvl;
+            validLevelCount++;
+          }
+
+          if (tVal !== null) {
+            if (tVal > peakTemp) peakTemp = tVal;
+            if (tVal < minTemp) minTemp = tVal;
+            sumTemp += tVal;
+            validTempCount++;
+          }
+        }
       });
 
-      const avg = Math.round(sum / records.length);
-      const totalVol = calculateVolume(peak).current;
-      const minVol = calculateVolume(min).current;
-      const avgVol = calculateVolume(avg).current;
+      // Level statistics (calculated strictly from valid non-null telemetry)
+      if (validLevelCount > 0) {
+        const avg = Math.round(sum / validLevelCount);
+        const totalVol = calculateVolume(peak).current;
+        const minVol = calculateVolume(min).current;
+        const avgVol = calculateVolume(avg).current;
 
-      document.getElementById("histPeakLevel").textContent = `${peak}%`;
-      document.getElementById("histPeakLitres").textContent = `${totalVol.toLocaleString()} L`;
-      document.getElementById("histMinLevel").textContent = `${min}%`;
-      document.getElementById("histMinLitres").textContent = `${minVol.toLocaleString()} L`;
-      document.getElementById("histAvgLevel").textContent = `${avg}%`;
-      document.getElementById("histAvgLitres").textContent = `${avgVol.toLocaleString()} L`;
+        document.getElementById("histPeakLevel").textContent = `${peak}%`;
+        document.getElementById("histPeakLitres").textContent = `${totalVol.toLocaleString()} L`;
+        document.getElementById("histMinLevel").textContent = `${min}%`;
+        document.getElementById("histMinLitres").textContent = `${minVol.toLocaleString()} L`;
+        document.getElementById("histAvgLevel").textContent = `${avg}%`;
+        document.getElementById("histAvgLitres").textContent = `${avgVol.toLocaleString()} L`;
+      } else {
+        document.getElementById("histPeakLevel").textContent = "--%";
+        document.getElementById("histPeakLitres").textContent = "-- L";
+        document.getElementById("histMinLevel").textContent = "--%";
+        document.getElementById("histMinLitres").textContent = "-- L";
+        document.getElementById("histAvgLevel").textContent = "--%";
+        document.getElementById("histAvgLitres").textContent = "-- L";
+      }
+
       document.getElementById("histTotalPoints").textContent = records.length;
       document.getElementById("histTimeSpan").textContent = `Span: ${label.toUpperCase()}`;
 
-      // Water Temperature Stats
+      // Water Temperature Stats (Truthful display: '--°C' if in sensor fault)
       if (validTempCount > 0) {
         document.getElementById("histPeakTemp").textContent = `${peakTemp.toFixed(1)}°C`;
         document.getElementById("histMinTemp").textContent = `${minTemp.toFixed(1)}°C`;
         const avgT = sumTemp / validTempCount;
         document.getElementById("histAvgTemp").textContent = `${avgT.toFixed(1)}°C`;
+      } else {
+        document.getElementById("histPeakTemp").textContent = "--°C";
+        document.getElementById("histMinTemp").textContent = "--°C";
+        document.getElementById("histAvgTemp").textContent = "--°C";
       }
 
+      // Update RF Tab KPI cards with latest genuine reading from this dataset
+      let latestRssi = null;
+      let latestSnr = null;
+      for (let i = records.length - 1; i >= 0; i--) {
+        const rR = Number(records[i].rssi);
+        const rS = Number(records[i].snr);
+        if (rR !== 0 || rS !== 0) {
+          latestRssi = rR;
+          latestSnr = rS;
+          break;
+        }
+      }
+      if (latestRssi !== null) {
+        const rfElem = document.getElementById("rfTabRssi");
+        const snrElem = document.getElementById("rfTabSnr");
+        const qualElem = document.getElementById("rfQualityLabel");
+        if (rfElem) rfElem.textContent = `${latestRssi} dBm`;
+        if (snrElem) snrElem.textContent = `${latestSnr > 0 ? '+' : ''}${latestSnr.toFixed(1)} dB`;
+        if (qualElem) {
+          if (latestRssi > -85) {
+            qualElem.textContent = "Quality: Excellent (> -85 dBm)";
+            qualElem.style.color = "var(--accent-green)";
+          } else if (latestRssi > -105) {
+            qualElem.textContent = "Quality: Good (-85 to -105 dBm)";
+            qualElem.style.color = "var(--accent-amber)";
+          } else {
+            qualElem.textContent = "Quality: Weak (< -105 dBm)";
+            qualElem.style.color = "var(--accent-red)";
+          }
+        }
+      }
+
+      // =========================================================
+      // OUTAGE & DOWNTIME AUDIT ENGINE
+      // Differentiates Office ESP32 Gateway vs Field Tank Nano
+      // =========================================================
+      const detectedOutages = [];
+      let espDowntimeMin = 0;
+      let nanoDowntimeMin = 0;
+      let espCount = 0;
+      let nanoCount = 0;
+      let maxOutageMin = 0;
+      let maxOutageDevice = "None";
+
+      // 1. Detect ESP32 Gaps (time between consecutive records >= 5 mins)
+      for (let i = 1; i < records.length; i++) {
+        const prev = records[i - 1];
+        const curr = records[i];
+        const tPrev = parseRecordTimestamp(prev);
+        const tCurr = parseRecordTimestamp(curr);
+        if (!isNaN(tPrev) && !isNaN(tCurr)) {
+          const diffMin = Math.round((tCurr - tPrev) / 60000);
+          if (diffMin >= 5) {
+            espCount++;
+            espDowntimeMin += diffMin;
+            if (diffMin > maxOutageMin) {
+              maxOutageMin = diffMin;
+              maxOutageDevice = "Office ESP32";
+            }
+            const startFormatted = prev.date ? `${prev.date.slice(5)} ${prev.time.slice(0, 5)}` : prev.time.slice(0, 5);
+            const endFormatted = curr.date ? `${curr.date.slice(5)} ${curr.time.slice(0, 5)}` : curr.time.slice(0, 5);
+            detectedOutages.push({
+              device: "Office ESP32 Gateway",
+              icon: "📶",
+              badgeBg: "rgba(2, 132, 199, 0.15)",
+              badgeColor: "#0284c7",
+              startTime: startFormatted,
+              recoveryTime: endFormatted,
+              durationMin: diffMin,
+              status: "RESOLVED",
+              cause: "Office Wi-Fi Disconnected / ESP32 Power Loss (Telemetry Gap)"
+            });
+          }
+        }
+      }
+
+      // 2. Detect Field Tank Nano Outages (Consecutive N/A or NANO OFFLINE rows)
+      let inNanoOutage = false;
+      let nanoStartIdx = -1;
+      for (let i = 0; i < records.length; i++) {
+        const r = records[i];
+        const isNa = (r.isNanoOffline === true || r.levelPct === null || r.levelPct === "N/A" || String(r.sensorFaults || "").indexOf("NANO OFFLINE") !== -1);
+        if (isNa && !inNanoOutage) {
+          inNanoOutage = true;
+          nanoStartIdx = i;
+        } else if (!isNa && inNanoOutage) {
+          inNanoOutage = false;
+          const startRec = records[nanoStartIdx];
+          const endRec = records[i];
+          const tStart = new Date(`${startRec.date}T${startRec.time}`).getTime();
+          const tEnd = new Date(`${endRec.date}T${endRec.time}`).getTime();
+          const diffMin = (!isNaN(tStart) && !isNaN(tEnd)) ? Math.max(1, Math.round((tEnd - tStart) / 60000)) : (i - nanoStartIdx) * 2;
+          nanoCount++;
+          nanoDowntimeMin += diffMin;
+          if (diffMin > maxOutageMin) {
+            maxOutageMin = diffMin;
+            maxOutageDevice = "Field Tank Nano";
+          }
+          const startFormatted = `${startRec.date.slice(5)} ${startRec.time.slice(0, 5)}`;
+          const endFormatted = `${endRec.date.slice(5)} ${endRec.time.slice(0, 5)}`;
+          detectedOutages.push({
+            device: "Field Tank Nano",
+            icon: "📡",
+            badgeBg: "rgba(245, 158, 11, 0.15)",
+            badgeColor: "#d97706",
+            startTime: startFormatted,
+            recoveryTime: endFormatted,
+            durationMin: diffMin,
+            status: "RESOLVED",
+            cause: "LoRa 433MHz Lost / Field Power Off (Logged as N/A by Gateway)"
+          });
+        }
+      }
+
+      // If records end while in an active Nano outage
+      if (inNanoOutage && nanoStartIdx >= 0) {
+        const startRec = records[nanoStartIdx];
+        const tStart = new Date(`${startRec.date}T${startRec.time}`).getTime();
+        const diffMin = !isNaN(tStart) ? Math.max(1, Math.round((Date.now() - tStart) / 60000)) : (records.length - nanoStartIdx) * 2;
+        nanoCount++;
+        nanoDowntimeMin += diffMin;
+        if (diffMin > maxOutageMin) {
+          maxOutageMin = diffMin;
+          maxOutageDevice = "Field Tank Nano";
+        }
+        detectedOutages.push({
+          device: "Field Tank Nano",
+          icon: "📡",
+          badgeBg: "rgba(220, 38, 38, 0.15)",
+          badgeColor: "#dc2626",
+          startTime: `${startRec.date.slice(5)} ${startRec.time.slice(0, 5)}`,
+          recoveryTime: "ONGOING",
+          durationMin: diffMin,
+          status: "ACTIVE",
+          cause: "LoRa 433MHz Lost / Field Power Off (Ongoing Outage)"
+        });
+      }
+
+      // Sort outages reverse chronologically (most recent first)
+      detectedOutages.reverse();
+
+      // Render Outage Summary KPIs
+      const espCountEl = document.getElementById("espOutageCount");
+      const espDowntimeEl = document.getElementById("espTotalDowntime");
+      const nanoCountEl = document.getElementById("nanoOutageCount");
+      const nanoDowntimeEl = document.getElementById("nanoTotalDowntime");
+      const maxDurationEl = document.getElementById("maxOutageDuration");
+      const maxDeviceEl = document.getElementById("maxOutageNode");
+      const overallStatusEl = document.getElementById("overallOutageStatus");
+      const overallDescEl = document.getElementById("overallOutageDesc");
+
+      if (espCountEl) espCountEl.textContent = espCount;
+      if (espDowntimeEl) espDowntimeEl.textContent = `Total: ${formatDurationMins(espDowntimeMin)}`;
+      if (nanoCountEl) nanoCountEl.textContent = nanoCount;
+      if (nanoDowntimeEl) nanoDowntimeEl.textContent = `Total: ${formatDurationMins(nanoDowntimeMin)}`;
+      if (maxDurationEl) maxDurationEl.textContent = maxOutageMin > 0 ? formatDurationMins(maxOutageMin) : "0m";
+      if (maxDeviceEl) maxDeviceEl.textContent = maxOutageDevice;
+
+      if (overallStatusEl && overallDescEl) {
+        if (inNanoOutage) {
+          overallStatusEl.textContent = "FIELD NANO OFFLINE";
+          overallStatusEl.style.color = "var(--accent-red)";
+          overallDescEl.textContent = "Field transmitter incommunicado";
+        } else if (detectedOutages.length > 0) {
+          overallStatusEl.textContent = "ALL ONLINE (RECOVERED)";
+          overallStatusEl.style.color = "var(--accent-green)";
+          overallDescEl.textContent = `${detectedOutages.length} past outage(s) logged`;
+        } else {
+          overallStatusEl.textContent = "100% OPERATIONAL";
+          overallStatusEl.style.color = "var(--accent-green)";
+          overallDescEl.textContent = "Zero downtime recorded";
+        }
+      }
+
+      // Render Outage Table Body
+      const tbody = document.getElementById("outageTableBody");
+      if (tbody) {
+        if (detectedOutages.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="padding:18px; text-align:center; color:var(--text-muted); font-weight:600;">🎉 Excellent Link Health: Zero outages detected across this period!</td></tr>';
+        } else {
+          tbody.innerHTML = detectedOutages.map(o => `
+            <tr style="border-bottom:1px solid var(--glass-border-subtle);">
+              <td style="padding:12px; font-weight:700;">
+                <span style="display:inline-flex; align-items:center; gap:6px; background:${o.badgeBg}; color:${o.badgeColor}; padding:3px 8px; border-radius:6px; font-size:12px;">
+                  <span>${o.icon}</span> ${o.device}
+                </span>
+              </td>
+              <td style="padding:12px; font-family:'JetBrains Mono',monospace; font-size:12px;">${o.startTime}</td>
+              <td style="padding:12px; font-family:'JetBrains Mono',monospace; font-size:12px;">${o.recoveryTime}</td>
+              <td style="padding:12px; font-weight:700; color:var(--text-main);">${formatDurationMins(o.durationMin)}</td>
+              <td style="padding:12px;">
+                <span class="badge ${o.status === 'RESOLVED' ? 'badge-green' : 'badge-red'}" style="padding:3px 8px; font-size:11px;">
+                  ${o.status === 'RESOLVED' ? '✅ RESOLVED' : '🚨 ACTIVE'}
+                </span>
+              </td>
+              <td style="padding:12px; color:var(--text-muted); font-size:12px;">${o.cause}</td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      // Update Chart Instances with true linear timeline (Red Dotted Line for all Gaps)
       if (waterHistoryChartInstance) {
-        waterHistoryChartInstance.data.labels = labels;
-        waterHistoryChartInstance.data.datasets[0].data = levels;
-        waterHistoryChartInstance.data.datasets[1].data = litres;
+        waterHistoryChartInstance.data.labels = [];
+        updateChartTimeScale(waterHistoryChartInstance, alignedMin, alignedMax, stepSize);
+        waterHistoryChartInstance.data.datasets[0].data = levelPoints;
+        waterHistoryChartInstance.data.datasets[0].spanGaps = true;
+        waterHistoryChartInstance.data.datasets[1].data = litresPoints;
+        waterHistoryChartInstance.data.datasets[1].spanGaps = true;
         waterHistoryChartInstance.update();
       }
 
       if (waterTempChartInstance) {
-        waterTempChartInstance.data.labels = labels;
-        waterTempChartInstance.data.datasets[0].data = temps;
+        waterTempChartInstance.data.labels = [];
+        updateChartTimeScale(waterTempChartInstance, alignedMin, alignedMax, stepSize);
+        waterTempChartInstance.data.datasets[0].data = tempPoints;
+        waterTempChartInstance.data.datasets[0].spanGaps = true;
         waterTempChartInstance.update();
       }
 
       if (rfSignalChartInstance) {
-        rfSignalChartInstance.data.labels = labels;
-        rfSignalChartInstance.data.datasets[0].data = rssi;
-        rfSignalChartInstance.data.datasets[1].data = snr;
+        rfSignalChartInstance.data.labels = [];
+        updateChartTimeScale(rfSignalChartInstance, alignedMin, alignedMax, stepSize);
+        rfSignalChartInstance.data.datasets[0].data = rssiPoints;
+        rfSignalChartInstance.data.datasets[0].spanGaps = true;
+        rfSignalChartInstance.data.datasets[1].data = snrPoints;
+        rfSignalChartInstance.data.datasets[1].spanGaps = true;
         rfSignalChartInstance.update();
       }
+
+      hideHistoryLoadingState();
     }
 
-    function generateFallbackHistoryData(label) {
-      const records = [];
-      const count = 24;
-      const now = new Date();
-      const current = currentLevel !== null ? currentLevel : 50;
-      const baseTemp = (currentWaterTemp !== null && !isNaN(currentWaterTemp)) ? currentWaterTemp : 28.5;
+    // Dynamic Chart Resize Observer (Adapts tick intervals when screen size / orientation changes)
+    let chartResizeDebounce = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(chartResizeDebounce);
+      chartResizeDebounce = setTimeout(() => {
+        if (cachedHistoryData && cachedHistoryData.length > 0) {
+          renderHistoryToCharts(cachedHistoryData, currentHistoryLabel || '24h');
+        }
+      }, 250);
+    });
 
-      for (let i = count; i >= 0; i--) {
-        const t = new Date(now.getTime() - (i * 3600 * 1000));
-        const hh = String(t.getHours()).padStart(2, '0');
-        const mm = String(t.getMinutes()).padStart(2, '0');
-        const lvl = Math.min(100, Math.max(10, Math.round(current + (Math.sin(i / 3) * 12))));
-        const temp = Number((baseTemp + (Math.sin(i / 4) * 2.2)).toFixed(1));
-        records.push({
-          date: t.toISOString().split("T")[0],
-          time: `${hh}:${mm}:00`,
-          levelPct: lvl,
-          litres: calculateVolume(lvl).current,
-          temperatureC: temp,
-          rssi: -78 + Math.round(Math.sin(i) * 5),
-          snr: 9.5 + Number((Math.cos(i) * 1.5).toFixed(1))
-        });
+    function generateFallbackHistoryData(label) {
+      if (cachedAllTodayRecords && cachedAllTodayRecords.length > 0) {
+        renderHistoryToCharts(cachedAllTodayRecords, label);
+        return;
       }
-      renderHistoryToCharts(records, label);
+      renderHistoryToCharts([], label);
     }
 
     // --- OTA Firmware Updates ---
@@ -4850,6 +5941,7 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
       calculateVolumeFromInputs();
       renderConnectionInfo("connecting");
       updateUI();
+      updateSpanGapsButtonUI();
 
       const initialTabBtn = document.querySelector(".tab-btn.active");
       if (initialTabBtn) {
@@ -5446,13 +6538,22 @@ watch(); window.SFX = { piano, star, init, warn, siren, crack, wave, shard, drai
     fly: { show: true, n: 36, mode: 'single', col: '#d2ff6e', pal: ['#d2ff6e', '#7ee8ff', '#ffb0f0', '#ffe27a'] },
     bird: { show: true, n: 6, style: 'black' },
     perch: { on: true }, scare: { on: true, r: 120, sp: 2 },
-    an: { show: true, deer: 1, zebra: 1, lion: 0, tiger: 0, hunt: true, elephant: 1, giraffe: 0, cow: 0, pig: 0, buffalo: 0, ox: 0, hippo: 0, rhino: 0, bison: 0, horse: 0, camel: 0, goat: 0, sheep: 0, kangaroo: 0, mammoth: 0, sauropod: 0, trex: 0, chipmunk: 1, squirrel: 1 },
+    an: { show: true, deer: 1, zebra: 1, lion: 2, tiger: 1, hunt: true, elephant: 1, giraffe: 0, cow: 0, pig: 0, buffalo: 0, ox: 0, hippo: 0, rhino: 0, bison: 0, horse: 0, camel: 0, goat: 0, sheep: 0, kangaroo: 0, mammoth: 0, sauropod: 0, trex: 0, chipmunk: 1, squirrel: 1 },
     freq: { perch: 'sometimes', critter: 'sometimes', animal: 'sometimes', hunt: 'sometimes' },
     fxl: { rays: true, ripple: true, force: false, lite: false, fps: '30' },
     mark: { op: MOB ? 50 : 100, fade: MOB ? 1 : 5 }
   };
   const FX = JSON.parse(JSON.stringify(FXD));
-  try { const sv = JSON.parse(localStorage.getItem('fx_cfg') || 'null'); if (sv) for (const k in FXD) Object.assign(FX[k], sv[k] || {}); } catch (e) {}
+  try {
+    const sv = JSON.parse(localStorage.getItem('fx_cfg') || 'null');
+    if (sv) for (const k in FXD) Object.assign(FX[k], sv[k] || {});
+    if (!localStorage.getItem('fx_lion_tiger_default_v2')) {
+      FX.an.lion = 2;
+      FX.an.tiger = 1;
+      localStorage.setItem('fx_lion_tiger_default_v2', '1');
+      try { localStorage.setItem('fx_cfg', JSON.stringify(FX)); } catch (e) {}
+    }
+  } catch (e) {}
   const SP = () => (FX.scare.sp || 2) / 2, GAPS = { sometimes: [40, 90], often: [12, 30], always: [1, 4] }, gap = k => { const q = GAPS[k] || GAPS.sometimes; return q[0] + R() * (q[1] - q[0]); };
   let pmx = -999, pmy = -999, CARDS = [], lastRay = 0, rip = [], animals = [], crit = [], ripT = 0;
   const LIGHT = { x: 0, y: 0, a: 0, moon: false, warm: 0 };
